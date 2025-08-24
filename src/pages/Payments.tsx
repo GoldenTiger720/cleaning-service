@@ -1,14 +1,20 @@
-import { Header } from "@/components/layout/header"
-import { Sidebar } from "@/components/layout/sidebar"
+import { useState } from "react"
+import * as React from "react"
+import { Layout } from "@/components/layout/layout"
 import { Button } from "@/components/ui/button"
+import { HeroSection } from "@/components/ui/hero-section"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Search, Plus, Download, Filter, DollarSign, CreditCard, Clock, TrendingUp } from "lucide-react"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useToast } from "@/hooks/use-toast"
+import { Search, Plus, Download, Filter, DollarSign, CreditCard, Clock, TrendingUp, Loader2, FileText, Send, Mail, Phone } from "lucide-react"
 
-const payments = [
+const initialPayments = [
   {
     id: 1,
     customer: "ABC Corporation",
@@ -65,30 +71,172 @@ const getStatusColor = (status: string) => {
 }
 
 export default function Payments() {
+  const [payments, setPayments] = useState(initialPayments)
+  const [filteredPayments, setFilteredPayments] = useState(initialPayments)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [statusFilter, setStatusFilter] = useState("All Status")
+  const [methodFilter, setMethodFilter] = useState("All Methods")
+  const [periodFilter, setPeriodFilter] = useState("This Month")
+  const [formData, setFormData] = useState({
+    customer: "",
+    amount: "",
+    method: "",
+    invoiceId: "",
+    service: ""
+  })
+  const { toast } = useToast()
+
+  // Filter payments
+  const filterPayments = () => {
+    let filtered = payments.filter(payment => {
+      const matchesSearch = searchTerm === "" || 
+        payment.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        payment.invoiceId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        payment.amount.toString().includes(searchTerm)
+      
+      const matchesStatus = statusFilter === "All Status" || payment.status === statusFilter
+      const matchesMethod = methodFilter === "All Methods" || payment.method === methodFilter
+
+      return matchesSearch && matchesStatus && matchesMethod
+    })
+    setFilteredPayments(filtered)
+  }
+
+  React.useEffect(() => {
+    filterPayments()
+  }, [searchTerm, statusFilter, methodFilter, periodFilter, payments])
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value)
+  }
+
+  const handleStatusFilter = () => {
+    const statuses = ["All Status", "Paid", "Pending", "Overdue"]
+    const currentIndex = statuses.indexOf(statusFilter)
+    const nextIndex = (currentIndex + 1) % statuses.length
+    setStatusFilter(statuses[nextIndex])
+    toast({ title: "Filter updated", description: `Filtering by status: ${statuses[nextIndex]}` })
+  }
+
+  const handleMethodFilter = () => {
+    const methods = ["All Methods", "Credit Card", "Bank Transfer", "Check", "ACH", "Cash"]
+    const currentIndex = methods.indexOf(methodFilter)
+    const nextIndex = (currentIndex + 1) % methods.length
+    setMethodFilter(methods[nextIndex])
+    toast({ title: "Filter updated", description: `Filtering by method: ${methods[nextIndex]}` })
+  }
+
+  const handlePeriodFilter = () => {
+    const periods = ["This Month", "Last Month", "This Quarter", "This Year"]
+    const currentIndex = periods.indexOf(periodFilter)
+    const nextIndex = (currentIndex + 1) % periods.length
+    setPeriodFilter(periods[nextIndex])
+    toast({ title: "Filter updated", description: `Filtering by period: ${periods[nextIndex]}` })
+  }
+
+  const handleExport = () => {
+    const csvContent = "data:text/csv;charset=utf-8," + 
+      "Customer,Service,Amount,Status,Method,Invoice,Due Date,Paid Date\n" +
+      payments.map(p => `${p.customer},${p.service},${p.amount},${p.status},${p.method},${p.invoiceId},${p.dueDate},${p.status === 'Paid' ? p.date : ''}`).join("\n")
+    
+    const encodedUri = encodeURI(csvContent)
+    const link = document.createElement("a")
+    link.setAttribute("href", encodedUri)
+    link.setAttribute("download", `payments_${new Date().toISOString().split('T')[0]}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    
+    toast({ title: "Export completed", description: "Payment data has been exported to CSV file." })
+  }
+
+  const handleRecordPayment = async (paymentId: number, customerName: string) => {
+    setIsLoading(true)
+    setTimeout(() => {
+      setPayments(prev => prev.map(payment => 
+        payment.id === paymentId 
+          ? { ...payment, status: "Paid" as const, date: new Date().toISOString().split('T')[0] }
+          : payment
+      ))
+      setIsLoading(false)
+      toast({ title: "Payment recorded", description: `Payment from ${customerName} has been marked as paid.` })
+    }, 1000)
+  }
+
+  const handleSendReminder = (customerName: string) => {
+    toast({ title: "Reminder sent", description: `Payment reminder has been sent to ${customerName}.` })
+  }
+
+  const handleContactCustomer = (customerName: string) => {
+    toast({ title: "Contact initiated", description: `Opening contact options for ${customerName}.` })
+  }
+
+  const handleViewPayment = (paymentId: number) => {
+    const payment = payments.find(p => p.id === paymentId)
+    toast({ title: "Viewing payment", description: `Opening details for ${payment?.invoiceId || 'payment'}.` })
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({ ...prev, [e.target.id]: e.target.value }))
+  }
+
+  const handleSelectChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  const resetForm = () => {
+    setFormData({ customer: "", amount: "", method: "", invoiceId: "", service: "" })
+  }
+
+  const handleAddPayment = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+
+    setTimeout(() => {
+      const newPayment = {
+        id: Math.max(...payments.map(p => p.id)) + 1,
+        customer: formData.customer,
+        amount: parseFloat(formData.amount),
+        status: "Paid" as const,
+        method: formData.method,
+        date: new Date().toISOString().split('T')[0],
+        invoiceId: formData.invoiceId || `INV-${String(Math.max(...payments.map(p => p.id)) + 1).padStart(3, '0')}`,
+        dueDate: new Date().toISOString().split('T')[0],
+        service: formData.service
+      }
+
+      setPayments(prev => [...prev, newPayment])
+      toast({ title: "Payment recorded successfully", description: `Payment from ${formData.customer} has been added.` })
+      resetForm()
+      setIsModalOpen(false)
+      setIsLoading(false)
+    }, 1000)
+  }
+
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1 p-6">
+    <Layout>
+      <div className="p-6">
           <div className="max-w-7xl mx-auto space-y-6">
-            {/* Header Section */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div>
-                <h1 className="text-3xl font-bold font-heading">Payment Management</h1>
-                <p className="text-muted-foreground">Track payments, invoices, and financial transactions</p>
-              </div>
+            {/* Hero Section */}
+            <HeroSection
+              title="Payment Management"
+              description="Track payments, invoices, and financial transactions. Stay on top of your cash flow and ensure timely payments."
+              imageUrl="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1600&h=400&fit=crop"
+              imageAlt="Financial money management"
+            >
               <div className="flex gap-2">
-                <Button variant="outline" size="lg">
+                <Button variant="outline" size="lg" onClick={handleExport} disabled={isLoading}>
                   <Download className="h-4 w-4" />
                   Export
                 </Button>
-                <Button variant="hero" size="lg">
+                <Button variant="hero" size="lg" onClick={() => setIsModalOpen(true)}>
                   <Plus className="h-4 w-4" />
                   New Payment
                 </Button>
               </div>
-            </div>
+            </HeroSection>
 
             {/* Search and Filters */}
             <Card>
@@ -99,15 +247,17 @@ export default function Payments() {
                     <Input
                       placeholder="Search payments by customer, invoice, or amount..."
                       className="pl-10"
+                      value={searchTerm}
+                      onChange={handleSearch}
                     />
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="outline">
+                    <Button variant="outline" onClick={handleStatusFilter}>
                       <Filter className="h-4 w-4" />
-                      All Status
+                      {statusFilter}
                     </Button>
-                    <Button variant="outline">All Methods</Button>
-                    <Button variant="outline">This Month</Button>
+                    <Button variant="outline" onClick={handleMethodFilter}>{methodFilter}</Button>
+                    <Button variant="outline" onClick={handlePeriodFilter}>{periodFilter}</Button>
                   </div>
                 </div>
               </CardContent>
@@ -204,7 +354,7 @@ export default function Payments() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {payments.map((payment) => (
+                        {filteredPayments.map((payment) => (
                           <TableRow key={payment.id}>
                             <TableCell>
                               <div>
@@ -243,9 +393,13 @@ export default function Payments() {
                             </TableCell>
                             <TableCell>
                               <div className="flex gap-2">
-                                <Button variant="outline" size="sm">View</Button>
+                                <Button variant="outline" size="sm" onClick={() => handleViewPayment(payment.id)} disabled={isLoading}>
+                                  <FileText className="h-3 w-3 mr-1" />View
+                                </Button>
                                 {payment.status !== "Paid" && (
-                                  <Button variant="outline" size="sm">Record Payment</Button>
+                                  <Button variant="outline" size="sm" onClick={() => handleRecordPayment(payment.id, payment.customer)} disabled={isLoading}>
+                                    <DollarSign className="h-3 w-3 mr-1" />Record Payment
+                                  </Button>
                                 )}
                               </div>
                             </TableCell>
@@ -310,8 +464,12 @@ export default function Payments() {
                           <div className="text-right">
                             <p className="font-medium">${payment.amount.toFixed(2)}</p>
                             <div className="flex gap-2 mt-2">
-                              <Button variant="outline" size="sm">Send Reminder</Button>
-                              <Button variant="outline" size="sm">Record Payment</Button>
+                              <Button variant="outline" size="sm" onClick={() => handleSendReminder(payment.customer)} disabled={isLoading}>
+                                <Send className="h-3 w-3 mr-1" />Send Reminder
+                              </Button>
+                              <Button variant="outline" size="sm" onClick={() => handleRecordPayment(payment.id, payment.customer)} disabled={isLoading}>
+                                <DollarSign className="h-3 w-3 mr-1" />Record Payment
+                              </Button>
                             </div>
                           </div>
                         </div>
@@ -344,8 +502,12 @@ export default function Payments() {
                           <div className="text-right">
                             <p className="font-medium text-destructive">${payment.amount.toFixed(2)}</p>
                             <div className="flex gap-2 mt-2">
-                              <Button variant="outline" size="sm">Contact Customer</Button>
-                              <Button variant="outline" size="sm">Record Payment</Button>
+                              <Button variant="outline" size="sm" onClick={() => handleContactCustomer(payment.customer)} disabled={isLoading}>
+                                <Phone className="h-3 w-3 mr-1" />Contact Customer
+                              </Button>
+                              <Button variant="outline" size="sm" onClick={() => handleRecordPayment(payment.id, payment.customer)} disabled={isLoading}>
+                                <DollarSign className="h-3 w-3 mr-1" />Record Payment
+                              </Button>
                             </div>
                           </div>
                         </div>
@@ -356,8 +518,107 @@ export default function Payments() {
               </TabsContent>
             </Tabs>
           </div>
-        </main>
       </div>
-    </div>
+
+        {/* New Payment Modal */}
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogContent className="sm:max-w-[525px]">
+            <DialogHeader>
+              <DialogTitle>Record New Payment</DialogTitle>
+              <DialogDescription>
+                Record a payment received from a customer.
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleAddPayment}>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="customer">Customer Name</Label>
+                  <Input
+                    id="customer"
+                    placeholder="Customer or company name"
+                    value={formData.customer}
+                    onChange={handleInputChange}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="service">Service Description</Label>
+                  <Input
+                    id="service"
+                    placeholder="Description of service provided"
+                    value={formData.service}
+                    onChange={handleInputChange}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="amount">Amount ($)</Label>
+                    <Input
+                      id="amount"
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={formData.amount}
+                      onChange={handleInputChange}
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="method">Payment Method</Label>
+                    <Select 
+                      value={formData.method} 
+                      onValueChange={(value) => handleSelectChange("method", value)}
+                      disabled={isLoading}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select method" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Credit Card">Credit Card</SelectItem>
+                        <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
+                        <SelectItem value="Check">Check</SelectItem>
+                        <SelectItem value="ACH">ACH</SelectItem>
+                        <SelectItem value="Cash">Cash</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="invoiceId">Invoice ID (optional)</Label>
+                  <Input
+                    id="invoiceId"
+                    placeholder="INV-001"
+                    value={formData.invoiceId}
+                    onChange={handleInputChange}
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => {
+                  setIsModalOpen(false)
+                  resetForm()
+                }} disabled={isLoading}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Recording...
+                    </>
+                  ) : (
+                    "Record Payment"
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+    </Layout>
   )
 }

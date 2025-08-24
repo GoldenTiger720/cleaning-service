@@ -27,7 +27,7 @@ const navigation = [
 
 export function Sidebar() {
   return (
-    <aside className="hidden md:flex w-64 flex-col bg-card border-r border-border">
+    <aside className="hidden md:flex w-64 flex-col bg-card border-r border-border fixed top-16 left-0 bottom-0">
       <div className="flex h-full flex-col">
         <nav className="flex-1 space-y-1 p-4">
           {navigation.map((item) => (

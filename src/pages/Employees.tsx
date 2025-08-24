@@ -1,5 +1,6 @@
-import { Header } from "@/components/layout/header"
-import { Sidebar } from "@/components/layout/sidebar"
+import { useState, useEffect } from "react"
+import * as React from "react"
+import { Layout } from "@/components/layout/layout"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -7,9 +8,15 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Search, Plus, Edit, Trash2, Phone, Mail, MapPin, Calendar } from "lucide-react"
+import { HeroSection } from "@/components/ui/hero-section"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useToast } from "@/hooks/use-toast"
+import { Search, Plus, Edit, Trash2, Phone, Mail, MapPin, Calendar, Loader2 } from "lucide-react"
 
-const employees = [
+const initialEmployees = [
   {
     id: 1,
     name: "Sarah Johnson",
@@ -46,24 +53,212 @@ const employees = [
 ]
 
 export default function Employees() {
+  const [employees, setEmployees] = useState(initialEmployees)
+  const [filteredEmployees, setFilteredEmployees] = useState(initialEmployees)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [editingEmployee, setEditingEmployee] = useState<typeof initialEmployees[0] | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [roleFilter, setRoleFilter] = useState("All Roles")
+  const [locationFilter, setLocationFilter] = useState("All Locations")
+  const [statusFilter, setStatusFilter] = useState("All Status")
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    role: "",
+    location: "",
+  })
+  const { toast } = useToast()
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.id]: e.target.value
+    }))
+  }
+
+  const handleSelectChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
+
+  // Filter employees based on search and filter criteria
+  const filterEmployees = () => {
+    let filtered = employees.filter(employee => {
+      const matchesSearch = searchTerm === "" || 
+        employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        employee.role.toLowerCase().includes(searchTerm.toLowerCase())
+      
+      const matchesRole = roleFilter === "All Roles" || employee.role === roleFilter
+      const matchesLocation = locationFilter === "All Locations" || employee.location === locationFilter
+      const matchesStatus = statusFilter === "All Status" || employee.status === statusFilter
+
+      return matchesSearch && matchesRole && matchesLocation && matchesStatus
+    })
+    setFilteredEmployees(filtered)
+  }
+
+  // Apply filters whenever search term or filters change
+  React.useEffect(() => {
+    filterEmployees()
+  }, [searchTerm, roleFilter, locationFilter, statusFilter, employees])
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value)
+  }
+
+  const handleRoleFilter = () => {
+    const roles = ["All Roles", "Cleaner", "Team Lead", "Supervisor", "Manager"]
+    const currentIndex = roles.indexOf(roleFilter)
+    const nextIndex = (currentIndex + 1) % roles.length
+    setRoleFilter(roles[nextIndex])
+    
+    toast({
+      title: "Filter updated",
+      description: `Filtering by: ${roles[nextIndex]}`,
+    })
+  }
+
+  const handleLocationFilter = () => {
+    const locations = ["All Locations", "Downtown", "Uptown", "Midtown", "Suburbs"]
+    const currentIndex = locations.indexOf(locationFilter)
+    const nextIndex = (currentIndex + 1) % locations.length
+    setLocationFilter(locations[nextIndex])
+    
+    toast({
+      title: "Filter updated",
+      description: `Filtering by: ${locations[nextIndex]}`,
+    })
+  }
+
+  const handleStatusFilter = () => {
+    const statuses = ["All Status", "Active", "On Leave"]
+    const currentIndex = statuses.indexOf(statusFilter)
+    const nextIndex = (currentIndex + 1) % statuses.length
+    setStatusFilter(statuses[nextIndex])
+    
+    toast({
+      title: "Filter updated",
+      description: `Filtering by: ${statuses[nextIndex]}`,
+    })
+  }
+
+  const handleEditEmployee = (employee: typeof initialEmployees[0]) => {
+    setIsEditMode(true)
+    setEditingEmployee(employee)
+    setFormData({
+      name: employee.name,
+      email: employee.email,
+      phone: employee.phone,
+      role: employee.role,
+      location: employee.location,
+    })
+    setIsModalOpen(true)
+  }
+
+  const handleDeleteEmployee = async (employeeId: number, employeeName: string) => {
+    setIsLoading(true)
+    
+    // Simulate API call
+    setTimeout(() => {
+      setEmployees(prev => prev.filter(emp => emp.id !== employeeId))
+      setIsLoading(false)
+      
+      toast({
+        title: "Employee removed",
+        description: `${employeeName} has been removed from your team.`,
+        variant: "destructive",
+      })
+    }, 1000)
+  }
+
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      role: "",
+      location: "",
+    })
+    setIsEditMode(false)
+    setEditingEmployee(null)
+  }
+
+  const handleAddEmployee = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+
+    // Simulate API call
+    setTimeout(() => {
+      if (isEditMode && editingEmployee) {
+        // Update existing employee
+        setEmployees(prev => prev.map(emp => 
+          emp.id === editingEmployee.id 
+            ? {
+                ...emp,
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone,
+                role: formData.role,
+                location: formData.location,
+              }
+            : emp
+        ))
+        
+        toast({
+          title: "Employee updated successfully",
+          description: `${formData.name}'s information has been updated.`,
+        })
+      } else {
+        // Add new employee
+        const newEmployee = {
+          id: Math.max(...employees.map(e => e.id)) + 1,
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          role: formData.role,
+          status: "Active" as const,
+          location: formData.location,
+          hireDate: new Date().toISOString().split('T')[0],
+          avatar: "/placeholder.svg"
+        }
+
+        setEmployees(prev => [...prev, newEmployee])
+        
+        toast({
+          title: "Employee added successfully",
+          description: `${formData.name} has been added to your team.`,
+        })
+      }
+
+      // Reset form
+      resetForm()
+      setIsModalOpen(false)
+      setIsLoading(false)
+    }, 1000)
+  }
+
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1 p-6">
-          <div className="max-w-7xl mx-auto space-y-6">
-            {/* Header Section */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div>
-                <h1 className="text-3xl font-bold font-heading">Employee Management</h1>
-                <p className="text-muted-foreground">Manage your cleaning team members</p>
-              </div>
-              <Button variant="hero" size="lg">
+    <Layout>
+      <div className="p-6">
+        <div className="max-w-7xl mx-auto space-y-6">
+            {/* Hero Section */}
+            <HeroSection
+              title="Employee Management"
+              description="Build and manage your exceptional cleaning team"
+              imageUrl="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1600&h=400&fit=crop"
+              imageAlt="Professional cleaning team working together"
+            >
+              <Button variant="hero" size="lg" onClick={() => setIsModalOpen(true)}>
                 <Plus className="h-4 w-4" />
                 Add Employee
               </Button>
-            </div>
+            </HeroSection>
 
             {/* Search and Filters */}
             <Card>
@@ -74,12 +269,14 @@ export default function Employees() {
                     <Input
                       placeholder="Search employees by name, email, or role..."
                       className="pl-10"
+                      value={searchTerm}
+                      onChange={handleSearch}
                     />
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="outline">All Roles</Button>
-                    <Button variant="outline">All Locations</Button>
-                    <Button variant="outline">All Status</Button>
+                    <Button variant="outline" onClick={handleRoleFilter}>{roleFilter}</Button>
+                    <Button variant="outline" onClick={handleLocationFilter}>{locationFilter}</Button>
+                    <Button variant="outline" onClick={handleStatusFilter}>{statusFilter}</Button>
                   </div>
                 </div>
               </CardContent>
@@ -167,7 +364,7 @@ export default function Employees() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {employees.map((employee) => (
+                        {filteredEmployees.map((employee) => (
                           <TableRow key={employee.id}>
                             <TableCell>
                               <div className="flex items-center gap-3">
@@ -207,12 +404,45 @@ export default function Employees() {
                             <TableCell>{employee.hireDate}</TableCell>
                             <TableCell>
                               <div className="flex gap-2">
-                                <Button variant="ghost" size="icon">
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon"
+                                  onClick={() => handleEditEmployee(employee)}
+                                  disabled={isLoading}
+                                >
                                   <Edit className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="icon">
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button variant="ghost" size="icon" disabled={isLoading}>
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Delete Employee</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Are you sure you want to remove {employee.name} from your team? This action cannot be undone.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() => handleDeleteEmployee(employee.id, employee.name)}
+                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                      >
+                                        {isLoading ? (
+                                          <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Deleting...
+                                          </>
+                                        ) : (
+                                          "Delete Employee"
+                                        )}
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
                               </div>
                             </TableCell>
                           </TableRow>
@@ -225,7 +455,7 @@ export default function Employees() {
 
               <TabsContent value="cards">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {employees.map((employee) => (
+                  {filteredEmployees.map((employee) => (
                     <Card key={employee.id}>
                       <CardContent className="p-6">
                         <div className="flex items-start justify-between mb-4">
@@ -264,13 +494,47 @@ export default function Employees() {
                           </div>
                         </div>
                         <div className="flex gap-2 mt-4">
-                          <Button variant="outline" size="sm" className="flex-1">
-                            <Edit className="h-3 w-3" />
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="flex-1"
+                            onClick={() => handleEditEmployee(employee)}
+                            disabled={isLoading}
+                          >
+                            <Edit className="h-3 w-3 mr-2" />
                             Edit
                           </Button>
-                          <Button variant="outline" size="sm">
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="outline" size="sm" disabled={isLoading}>
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Employee</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to remove {employee.name} from your team? This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDeleteEmployee(employee.id, employee.name)}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                >
+                                  {isLoading ? (
+                                    <>
+                                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                      Deleting...
+                                    </>
+                                  ) : (
+                                    "Delete Employee"
+                                  )}
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
                       </CardContent>
                     </Card>
@@ -279,8 +543,115 @@ export default function Employees() {
               </TabsContent>
             </Tabs>
           </div>
-        </main>
-      </div>
-    </div>
+        </div>
+
+        {/* Add Employee Modal */}
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>{isEditMode ? "Edit Employee" : "Add New Employee"}</DialogTitle>
+              <DialogDescription>
+                {isEditMode 
+                  ? "Update the information for this team member." 
+                  : "Add a new team member to your cleaning company."
+                }
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleAddEmployee}>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input
+                    id="name"
+                    placeholder="John Doe"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="john.doe@cleanpro.com"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="(555) 123-4567"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="role">Role</Label>
+                  <Select 
+                    value={formData.role} 
+                    onValueChange={(value) => handleSelectChange("role", value)}
+                    disabled={isLoading}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Cleaner">Cleaner</SelectItem>
+                      <SelectItem value="Team Lead">Team Lead</SelectItem>
+                      <SelectItem value="Supervisor">Supervisor</SelectItem>
+                      <SelectItem value="Manager">Manager</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="location">Location</Label>
+                  <Select 
+                    value={formData.location} 
+                    onValueChange={(value) => handleSelectChange("location", value)}
+                    disabled={isLoading}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a location" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Downtown">Downtown</SelectItem>
+                      <SelectItem value="Uptown">Uptown</SelectItem>
+                      <SelectItem value="Midtown">Midtown</SelectItem>
+                      <SelectItem value="Suburbs">Suburbs</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => {
+                  setIsModalOpen(false)
+                  resetForm()
+                }} disabled={isLoading}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {isEditMode ? "Updating..." : "Saving..."}
+                    </>
+                  ) : (
+                    isEditMode ? "Update Employee" : "Save Employee"
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </Layout>
   )
 }

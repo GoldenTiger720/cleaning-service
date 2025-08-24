@@ -1,6 +1,6 @@
-import { Header } from "@/components/layout/header"
-import { Sidebar } from "@/components/layout/sidebar"
+import { Layout } from "@/components/layout/layout"
 import { Button } from "@/components/ui/button"
+import { HeroSection } from "@/components/ui/hero-section"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -20,26 +20,35 @@ import {
   Save,
   Eye,
   EyeOff
+  Loader2
 } from "lucide-react"
 import { useState } from "react"
+import { useToast } from "@/hooks/use-toast"
 
 export default function Settings() {
   const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const { toast } = useToast()
+
+  const handleSave = (section: string) => {
+    setIsLoading(true)
+    setTimeout(() => {
+      toast({ title: "Settings saved", description: `${section} settings updated successfully.` })
+      setIsLoading(false)
+    }, 1000)
+  }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1 p-6">
+    <Layout>
+      <div className="p-6">
           <div className="max-w-4xl mx-auto space-y-6">
-            {/* Header Section */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div>
-                <h1 className="text-3xl font-bold font-heading">Settings</h1>
-                <p className="text-muted-foreground">Configure your cleaning company management system</p>
-              </div>
-            </div>
+            {/* Hero Section */}
+            <HeroSection
+              title="Settings"
+              description="Configure your cleaning company management system. Customize preferences, manage team access, and optimize your workflow."
+              imageUrl="https://images.unsplash.com/photo-1518770660439-4636190af475?w=1600&h=400&fit=crop"
+              imageAlt="Technology gears and settings"
+            />
 
             {/* Settings Tabs */}
             <Tabs defaultValue="company" className="space-y-6">
@@ -139,8 +148,8 @@ export default function Settings() {
                       </div>
                     </div>
 
-                    <Button className="w-full sm:w-auto">
-                      <Save className="h-4 w-4 mr-2" />
+                    <Button className="w-full sm:w-auto" onClick={() => handleSave("Company")} disabled={isLoading}>
+                      {isLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
                       Save Company Settings
                     </Button>
                   </CardContent>
@@ -191,8 +200,8 @@ export default function Settings() {
                       </Select>
                     </div>
 
-                    <Button className="w-full sm:w-auto">
-                      <Save className="h-4 w-4 mr-2" />
+                    <Button className="w-full sm:w-auto" onClick={() => handleSave("Profile")} disabled={isLoading}>
+                      {isLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
                       Update Profile
                     </Button>
                   </CardContent>
@@ -256,8 +265,8 @@ export default function Settings() {
                       </div>
                     </div>
 
-                    <Button className="w-full sm:w-auto">
-                      <Save className="h-4 w-4 mr-2" />
+                    <Button className="w-full sm:w-auto" onClick={() => handleSave("Notifications")} disabled={isLoading}>
+                      {isLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
                       Save Notification Settings
                     </Button>
                   </CardContent>
@@ -325,8 +334,8 @@ export default function Settings() {
                       </div>
                     </div>
 
-                    <Button className="w-full sm:w-auto">
-                      <Save className="h-4 w-4 mr-2" />
+                    <Button className="w-full sm:w-auto" onClick={() => handleSave("Security")} disabled={isLoading}>
+                      {isLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
                       Update Security Settings
                     </Button>
                   </CardContent>
@@ -436,8 +445,8 @@ export default function Settings() {
                       </Select>
                     </div>
 
-                    <Button className="w-full sm:w-auto">
-                      <Save className="h-4 w-4 mr-2" />
+                    <Button className="w-full sm:w-auto" onClick={() => handleSave("Team")} disabled={isLoading}>
+                      {isLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
                       Save Team Settings
                     </Button>
                   </CardContent>
@@ -445,8 +454,7 @@ export default function Settings() {
               </TabsContent>
             </Tabs>
           </div>
-        </main>
       </div>
-    </div>
+    </Layout>
   )
 }

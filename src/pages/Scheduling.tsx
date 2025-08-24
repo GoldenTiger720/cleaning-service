@@ -1,15 +1,23 @@
-import { Header } from "@/components/layout/header"
-import { Sidebar } from "@/components/layout/sidebar"
+import { Layout } from "@/components/layout/layout"
 import { Button } from "@/components/ui/button"
+import { HeroSection } from "@/components/ui/hero-section"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Calendar } from "@/components/ui/calendar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Plus, Calendar as CalendarIcon, Clock, MapPin, Users, Filter } from "lucide-react"
-import { useState } from "react"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { useToast } from "@/hooks/use-toast"
+import { Plus, Calendar as CalendarIcon, Clock, MapPin, Users, Filter, Play, CheckCircle, XCircle, Eye, Edit, Loader2 } from "lucide-react"
+import { useState, useEffect } from "react"
+import * as React from "react"
 
-const schedules = [
+const initialSchedules = [
   {
     id: 1,
     customer: "ABC Corporation",
@@ -46,26 +54,209 @@ const schedules = [
 ]
 
 export default function Scheduling() {
+  const [schedules, setSchedules] = useState(initialSchedules)
+  const [filteredSchedules, setFilteredSchedules] = useState(initialSchedules)
   const [date, setDate] = useState<Date | undefined>(new Date())
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [editingSchedule, setEditingSchedule] = useState<typeof initialSchedules[0] | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [statusFilter, setStatusFilter] = useState("All")
+  const [typeFilter, setTypeFilter] = useState("All")
+  const [formData, setFormData] = useState({
+    customer: "",
+    location: "",
+    time: "",
+    date: "",
+    employees: [] as string[],
+    type: "",
+    duration: ""
+  })
+  const { toast } = useToast()
+
+  // Filter schedules
+  const filterSchedules = () => {
+    let filtered = schedules.filter(schedule => {
+      const matchesStatus = statusFilter === "All" || schedule.status === statusFilter
+      const matchesType = typeFilter === "All" || schedule.type === typeFilter
+      return matchesStatus && matchesType
+    })
+    setFilteredSchedules(filtered)
+  }
+
+  React.useEffect(() => {
+    filterSchedules()
+  }, [statusFilter, typeFilter, schedules])
+
+  const handleFilter = () => {
+    const statuses = ["All", "Scheduled", "In Progress", "Completed", "Cancelled"]
+    const currentIndex = statuses.indexOf(statusFilter)
+    const nextIndex = (currentIndex + 1) % statuses.length
+    setStatusFilter(statuses[nextIndex])
+    
+    toast({
+      title: "Filter updated",
+      description: `Filtering by status: ${statuses[nextIndex]}`,
+    })
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.id]: e.target.value
+    }))
+  }
+
+  const handleSelectChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
+
+  const handleEditSchedule = (schedule: typeof initialSchedules[0]) => {
+    setIsEditMode(true)
+    setEditingSchedule(schedule)
+    setFormData({
+      customer: schedule.customer,
+      location: schedule.location,
+      time: schedule.time,
+      date: schedule.date,
+      employees: schedule.employees,
+      type: schedule.type,
+      duration: schedule.duration,
+    })
+    setIsModalOpen(true)
+  }
+
+  const handleViewSchedule = (schedule: typeof initialSchedules[0]) => {
+    toast({
+      title: "Viewing Schedule",
+      description: `Opening details for ${schedule.customer}'s appointment`,
+    })
+  }
+
+  const handleUpdateStatus = async (scheduleId: number, newStatus: string, customerName: string) => {
+    setIsLoading(true)
+    
+    // Simulate API call
+    setTimeout(() => {
+      setSchedules(prev => prev.map(schedule => 
+        schedule.id === scheduleId 
+          ? { ...schedule, status: newStatus }
+          : schedule
+      ))
+      setIsLoading(false)
+      
+      toast({
+        title: "Status Updated",
+        description: `${customerName}'s appointment status changed to ${newStatus}`,
+      })
+    }, 1000)
+  }
+
+  const handleCancelSchedule = async (scheduleId: number, customerName: string) => {
+    setIsLoading(true)
+    
+    // Simulate API call
+    setTimeout(() => {
+      setSchedules(prev => prev.filter(schedule => schedule.id !== scheduleId))
+      setIsLoading(false)
+      
+      toast({
+        title: "Appointment Cancelled",
+        description: `${customerName}'s appointment has been cancelled and removed.`,
+        variant: "destructive",
+      })
+    }, 1000)
+  }
+
+  const resetForm = () => {
+    setFormData({
+      customer: "",
+      location: "",
+      time: "",
+      date: "",
+      employees: [],
+      type: "",
+      duration: ""
+    })
+    setIsEditMode(false)
+    setEditingSchedule(null)
+  }
+
+  const handleAddSchedule = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+
+    // Simulate API call
+    setTimeout(() => {
+      if (isEditMode && editingSchedule) {
+        // Update existing schedule
+        setSchedules(prev => prev.map(schedule => 
+          schedule.id === editingSchedule.id 
+            ? {
+                ...schedule,
+                customer: formData.customer,
+                location: formData.location,
+                time: formData.time,
+                date: formData.date,
+                employees: formData.employees,
+                type: formData.type,
+                duration: formData.duration,
+              }
+            : schedule
+        ))
+        
+        toast({
+          title: "Appointment updated successfully",
+          description: `${formData.customer}'s appointment has been updated.`,
+        })
+      } else {
+        // Add new schedule
+        const newSchedule = {
+          id: Math.max(...schedules.map(s => s.id)) + 1,
+          customer: formData.customer,
+          location: formData.location,
+          time: formData.time,
+          date: formData.date,
+          employees: formData.employees,
+          status: "Scheduled" as const,
+          type: formData.type,
+          duration: formData.duration
+        }
+
+        setSchedules(prev => [...prev, newSchedule])
+        
+        toast({
+          title: "Appointment scheduled successfully",
+          description: `${formData.customer}'s appointment has been added to the schedule.`,
+        })
+      }
+
+      // Reset form
+      resetForm()
+      setIsModalOpen(false)
+      setIsLoading(false)
+    }, 1000)
+  }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1 p-6">
+    <Layout>
+      <div className="p-6">
           <div className="max-w-7xl mx-auto space-y-6">
-            {/* Header Section */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div>
-                <h1 className="text-3xl font-bold font-heading">Schedule Management</h1>
-                <p className="text-muted-foreground">Organize cleaning appointments and team assignments</p>
-              </div>
-              <Button variant="hero" size="lg">
+            {/* Hero Section */}
+            <HeroSection
+              title="Schedule Management"
+              description="Organize cleaning appointments and team assignments efficiently. Plan ahead, track progress, and ensure no job is missed."
+              imageUrl="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=1600&h=400&fit=crop"
+              imageAlt="Calendar planning"
+            >
+              <Button variant="hero" size="lg" onClick={() => setIsModalOpen(true)}>
                 <Plus className="h-4 w-4" />
                 New Appointment
               </Button>
-            </div>
+            </HeroSection>
 
             {/* Quick Stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -145,9 +336,9 @@ export default function Scheduling() {
               <div className="lg:col-span-2 space-y-6">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-semibold">Today's Schedule</h2>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={handleFilter}>
                     <Filter className="h-4 w-4" />
-                    Filter
+                    Filter by: {statusFilter}
                   </Button>
                 </div>
 
@@ -158,7 +349,7 @@ export default function Scheduling() {
                   </TabsList>
 
                   <TabsContent value="timeline" className="space-y-4">
-                    {schedules.map((schedule) => (
+                    {filteredSchedules.map((schedule) => (
                       <Card key={schedule.id}>
                         <CardContent className="p-6">
                           <div className="flex items-start justify-between mb-4">
@@ -207,9 +398,83 @@ export default function Scheduling() {
                                 {schedule.employees.length} team member{schedule.employees.length > 1 ? 's' : ''}
                               </span>
                             </div>
-                            <div className="flex gap-2">
-                              <Button variant="outline" size="sm">Edit</Button>
-                              <Button variant="outline" size="sm">View</Button>
+                            <div className="flex gap-2 flex-wrap">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handleEditSchedule(schedule)}
+                                disabled={isLoading}
+                              >
+                                <Edit className="h-3 w-3 mr-1" />
+                                Edit
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handleViewSchedule(schedule)}
+                                disabled={isLoading}
+                              >
+                                <Eye className="h-3 w-3 mr-1" />
+                                View
+                              </Button>
+                              {schedule.status === "Scheduled" && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleUpdateStatus(schedule.id, "In Progress", schedule.customer)}
+                                  disabled={isLoading}
+                                >
+                                  <Play className="h-3 w-3 mr-1" />
+                                  Start
+                                </Button>
+                              )}
+                              {schedule.status === "In Progress" && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleUpdateStatus(schedule.id, "Completed", schedule.customer)}
+                                  disabled={isLoading}
+                                >
+                                  <CheckCircle className="h-3 w-3 mr-1" />
+                                  Complete
+                                </Button>
+                              )}
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    disabled={isLoading}
+                                  >
+                                    <XCircle className="h-3 w-3 mr-1" />
+                                    Cancel
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Cancel Appointment</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Are you sure you want to cancel the appointment for {schedule.customer}? This action cannot be undone.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Keep Appointment</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => handleCancelSchedule(schedule.id, schedule.customer)}
+                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                    >
+                                      {isLoading ? (
+                                        <>
+                                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                          Cancelling...
+                                        </>
+                                      ) : (
+                                        "Cancel Appointment"
+                                      )}
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
                             </div>
                           </div>
                         </CardContent>
@@ -219,7 +484,7 @@ export default function Scheduling() {
 
                   <TabsContent value="list" className="space-y-4">
                     <div className="space-y-3">
-                      {schedules.map((schedule) => (
+                      {filteredSchedules.map((schedule) => (
                         <Card key={schedule.id}>
                           <CardContent className="p-4">
                             <div className="flex items-center justify-between">
@@ -245,9 +510,49 @@ export default function Scheduling() {
                                   </div>
                                 </div>
                               </div>
-                              <Badge variant={schedule.status === "In Progress" ? "default" : "secondary"}>
-                                {schedule.status}
-                              </Badge>
+                              <div className="flex items-center gap-2">
+                                <Badge variant={schedule.status === "In Progress" ? "default" : "secondary"}>
+                                  {schedule.status}
+                                </Badge>
+                                <div className="flex gap-1">
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm"
+                                    onClick={() => handleEditSchedule(schedule)}
+                                    disabled={isLoading}
+                                  >
+                                    <Edit className="h-3 w-3" />
+                                  </Button>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm"
+                                    onClick={() => handleViewSchedule(schedule)}
+                                    disabled={isLoading}
+                                  >
+                                    <Eye className="h-3 w-3" />
+                                  </Button>
+                                  {schedule.status === "Scheduled" && (
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm"
+                                      onClick={() => handleUpdateStatus(schedule.id, "In Progress", schedule.customer)}
+                                      disabled={isLoading}
+                                    >
+                                      <Play className="h-3 w-3" />
+                                    </Button>
+                                  )}
+                                  {schedule.status === "In Progress" && (
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm"
+                                      onClick={() => handleUpdateStatus(schedule.id, "Completed", schedule.customer)}
+                                      disabled={isLoading}
+                                    >
+                                      <CheckCircle className="h-3 w-3" />
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
                             </div>
                           </CardContent>
                         </Card>
@@ -258,8 +563,132 @@ export default function Scheduling() {
               </div>
             </div>
           </div>
-        </main>
       </div>
-    </div>
+
+        {/* Add/Edit Appointment Modal */}
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogContent className="sm:max-w-[525px]">
+            <DialogHeader>
+              <DialogTitle>{isEditMode ? "Edit Appointment" : "New Appointment"}</DialogTitle>
+              <DialogDescription>
+                {isEditMode 
+                  ? "Update the appointment details." 
+                  : "Schedule a new cleaning appointment."
+                }
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleAddSchedule}>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="customer">Customer</Label>
+                  <Input
+                    id="customer"
+                    placeholder="Customer name"
+                    value={formData.customer}
+                    onChange={handleInputChange}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="location">Location</Label>
+                  <Textarea
+                    id="location"
+                    placeholder="Service address"
+                    value={formData.location}
+                    onChange={handleInputChange}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="date">Date</Label>
+                    <Input
+                      id="date"
+                      type="date"
+                      value={formData.date}
+                      onChange={handleInputChange}
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="time">Time</Label>
+                    <Input
+                      id="time"
+                      placeholder="09:00 - 12:00"
+                      value={formData.time}
+                      onChange={handleInputChange}
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="type">Service Type</Label>
+                    <Select 
+                      value={formData.type} 
+                      onValueChange={(value) => handleSelectChange("type", value)}
+                      disabled={isLoading}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Residential">Residential</SelectItem>
+                        <SelectItem value="Commercial">Commercial</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="duration">Duration</Label>
+                    <Input
+                      id="duration"
+                      placeholder="2 hours"
+                      value={formData.duration}
+                      onChange={handleInputChange}
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="employees">Team Members (comma-separated)</Label>
+                  <Input
+                    id="employees"
+                    placeholder="Sarah Johnson, Mike Rodriguez"
+                    value={formData.employees.join(", ")}
+                    onChange={(e) => {
+                      const employees = e.target.value.split(",").map(emp => emp.trim()).filter(emp => emp)
+                      setFormData(prev => ({ ...prev, employees }))
+                    }}
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => {
+                  setIsModalOpen(false)
+                  resetForm()
+                }} disabled={isLoading}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {isEditMode ? "Updating..." : "Scheduling..."}
+                    </>
+                  ) : (
+                    isEditMode ? "Update Appointment" : "Schedule Appointment"
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+    </Layout>
   )
 }

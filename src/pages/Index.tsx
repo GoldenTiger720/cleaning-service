@@ -8,8 +8,7 @@ import {
   Package, 
   AlertTriangle 
 } from "lucide-react"
-import { Header } from "@/components/layout/header"
-import { Sidebar } from "@/components/layout/sidebar"
+import { Layout } from "@/components/layout/layout"
 import { StatsCard } from "@/components/dashboard/stats-card"
 import { RecentJobs } from "@/components/dashboard/recent-jobs"
 import { QuickActions } from "@/components/dashboard/quick-actions"
@@ -18,13 +17,8 @@ import dashboardBg from "@/assets/dashboard-bg.jpg"
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
-      <div className="flex">
-        <Sidebar />
-        
-        <main className="flex-1 p-6 space-y-6">
+    <Layout>
+      <div className="p-6 space-y-6">
           {/* Hero Section */}
           <div 
             className="relative rounded-xl overflow-hidden bg-gradient-hero text-white p-8"
@@ -147,9 +141,8 @@ const Index = () => {
               backgroundPosition: 'center'
             }}
           />
-        </main>
       </div>
-    </div>
+    </Layout>
   );
 };
 

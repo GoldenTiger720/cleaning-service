@@ -13,6 +13,8 @@ import Payments from "./pages/Payments";
 import TimeTracking from "./pages/TimeTracking";
 import Invoices from "./pages/Invoices";
 import Settings from "./pages/Settings";
+import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +28,8 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
             <Route path="/employees" element={<Employees />} />
             <Route path="/customers" element={<Customers />} />
             <Route path="/scheduling" element={<Scheduling />} />

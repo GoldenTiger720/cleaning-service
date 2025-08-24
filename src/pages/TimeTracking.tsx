@@ -1,6 +1,8 @@
-import { Header } from "@/components/layout/header"
-import { Sidebar } from "@/components/layout/sidebar"
+import { useState } from "react"
+import * as React from "react"
+import { Layout } from "@/components/layout/layout"
 import { Button } from "@/components/ui/button"
+import { HeroSection } from "@/components/ui/hero-section"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -8,7 +10,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
-import { Search, Play, Pause, Clock, Calendar, Users, TrendingUp, Filter } from "lucide-react"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { useToast } from "@/hooks/use-toast"
+import { Search, Play, Pause, Clock, Calendar, Users, TrendingUp, Filter, StopCircle, Loader2 } from "lucide-react"
 
 const timeEntries = [
   {
@@ -59,24 +64,53 @@ const weeklyStats = [
 ]
 
 export default function TimeTracking() {
+  const [entries, setEntries] = useState(timeEntries)
+  const [isTimerModalOpen, setIsTimerModalOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [activeTimer, setActiveTimer] = useState<number | null>(null)
+  const { toast } = useToast()
+
+  const handleStartTimer = () => {
+    setIsTimerModalOpen(true)
+  }
+
+  const handleClockIn = (employeeName: string) => {
+    setIsLoading(true)
+    setTimeout(() => {
+      toast({ title: "Clocked In", description: `${employeeName} has been clocked in successfully.` })
+      setIsLoading(false)
+    }, 1000)
+  }
+
+  const handleStopTimer = (entryId: number, employeeName: string) => {
+    setIsLoading(true)
+    setTimeout(() => {
+      setEntries(prev => prev.map(entry => 
+        entry.id === entryId 
+          ? { ...entry, status: "Completed" as const, endTime: "17:30", totalHours: 7.0 }
+          : entry
+      ))
+      toast({ title: "Timer Stopped", description: `Time entry for ${employeeName} has been completed.` })
+      setIsLoading(false)
+    }, 1000)
+  }
+
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1 p-6">
+    <Layout>
+      <div className="p-6">
           <div className="max-w-7xl mx-auto space-y-6">
-            {/* Header Section */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div>
-                <h1 className="text-3xl font-bold font-heading">Time Tracking</h1>
-                <p className="text-muted-foreground">Monitor work hours and productivity</p>
-              </div>
+            {/* Hero Section */}
+            <HeroSection
+              title="Time Tracking"
+              description="Monitor work hours and productivity across your team. Track time spent on jobs, measure efficiency, and optimize workflows."
+              imageUrl="https://images.unsplash.com/photo-1611348586804-61bf6c080437?w=1600&h=400&fit=crop"
+              imageAlt="Clock and time management"
+            >
               <Button variant="hero" size="lg">
                 <Play className="h-4 w-4" />
                 Start Timer
               </Button>
-            </div>
+            </HeroSection>
 
             {/* Search and Filters */}
             <Card>
@@ -344,8 +378,7 @@ export default function TimeTracking() {
               </TabsContent>
             </Tabs>
           </div>
-        </main>
       </div>
-    </div>
+    </Layout>
   )
 }

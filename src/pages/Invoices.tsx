@@ -1,14 +1,16 @@
-import { Header } from "@/components/layout/header"
-import { Sidebar } from "@/components/layout/sidebar"
+import { useState } from "react"
+import { Layout } from "@/components/layout/layout"
 import { Button } from "@/components/ui/button"
+import { HeroSection } from "@/components/ui/hero-section"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Search, Plus, Download, Send, Eye, Edit, FileText, DollarSign, Clock, CheckCircle } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
+import { Search, Plus, Download, Send, Eye, Edit, FileText, DollarSign, Clock, CheckCircle, Loader2, Trash2 } from "lucide-react"
 
-const invoices = [
+const initialInvoices = [
   {
     id: 1,
     number: "INV-001",
@@ -93,30 +95,48 @@ const getStatusIcon = (status: string) => {
 }
 
 export default function Invoices() {
+  const [invoices, setInvoices] = useState(initialInvoices)
+  const [isLoading, setIsLoading] = useState(false)
+  const { toast } = useToast()
+
+  const handleExport = () => {
+    toast({ title: "Export completed", description: "Invoice data exported successfully." })
+  }
+
+  const handleNewInvoice = () => {
+    toast({ title: "New Invoice", description: "Opening invoice creation form." })
+  }
+
+  const handleSendInvoice = (invoiceNumber: string) => {
+    toast({ title: "Invoice Sent", description: `${invoiceNumber} has been sent to customer.` })
+  }
+
+  const handleDownloadInvoice = (invoiceNumber: string) => {
+    toast({ title: "Downloading", description: `${invoiceNumber} is being downloaded.` })
+  }
+
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1 p-6">
+    <Layout>
+      <div className="p-6">
           <div className="max-w-7xl mx-auto space-y-6">
-            {/* Header Section */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div>
-                <h1 className="text-3xl font-bold font-heading">Invoice Management</h1>
-                <p className="text-muted-foreground">Create, send, and track invoices</p>
-              </div>
+            {/* Hero Section */}
+            <HeroSection
+              title="Invoice Management"
+              description="Create, send, and track invoices with ease. Manage your billing process and ensure timely payments from clients."
+              imageUrl="https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=1600&h=400&fit=crop"
+              imageAlt="Documents and paperwork"
+            >
               <div className="flex gap-2">
-                <Button variant="outline" size="lg">
+                <Button variant="outline" size="lg" onClick={handleExport}>
                   <Download className="h-4 w-4" />
                   Export
                 </Button>
-                <Button variant="hero" size="lg">
+                <Button variant="hero" size="lg" onClick={handleNewInvoice}>
                   <Plus className="h-4 w-4" />
                   New Invoice
                 </Button>
               </div>
-            </div>
+            </HeroSection>
 
             {/* Search and Filters */}
             <Card>
@@ -435,8 +455,7 @@ export default function Invoices() {
               </TabsContent>
             </Tabs>
           </div>
-        </main>
       </div>
-    </div>
+    </Layout>
   )
 }

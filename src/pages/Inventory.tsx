@@ -1,15 +1,22 @@
-import { Header } from "@/components/layout/header"
-import { Sidebar } from "@/components/layout/sidebar"
+import { useState } from "react"
+import * as React from "react"
+import { Layout } from "@/components/layout/layout"
 import { Button } from "@/components/ui/button"
+import { HeroSection } from "@/components/ui/hero-section"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
-import { Search, Plus, Edit, Trash2, Package, AlertTriangle, TrendingUp, TrendingDown } from "lucide-react"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useToast } from "@/hooks/use-toast"
+import { Search, Plus, Edit, Trash2, Package, AlertTriangle, TrendingUp, TrendingDown, Loader2, ShoppingCart } from "lucide-react"
 
-const inventory = [
+const initialInventory = [
   {
     id: 1,
     name: "All-Purpose Cleaner",
@@ -72,24 +79,185 @@ const getStockStatus = (current: number, min: number) => {
 }
 
 export default function Inventory() {
+  const [inventory, setInventory] = useState(initialInventory)
+  const [filteredInventory, setFilteredInventory] = useState(initialInventory)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [editingItem, setEditingItem] = useState<typeof initialInventory[0] | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [categoryFilter, setCategoryFilter] = useState("All Categories")
+  const [statusFilter, setStatusFilter] = useState("All Status")
+  const [supplierFilter, setSupplierFilter] = useState("All Suppliers")
+  const [formData, setFormData] = useState({
+    name: "",
+    category: "",
+    currentStock: "",
+    minStock: "",
+    maxStock: "",
+    unit: "",
+    costPerUnit: "",
+    supplier: ""
+  })
+  const { toast } = useToast()
+
+  // Filter inventory
+  const filterInventory = () => {
+    let filtered = inventory.filter(item => {
+      const matchesSearch = searchTerm === "" || 
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.supplier.toLowerCase().includes(searchTerm.toLowerCase())
+      
+      const matchesCategory = categoryFilter === "All Categories" || item.category === categoryFilter
+      const matchesStatus = statusFilter === "All Status" || item.status === statusFilter
+      const matchesSupplier = supplierFilter === "All Suppliers" || item.supplier === supplierFilter
+
+      return matchesSearch && matchesCategory && matchesStatus && matchesSupplier
+    })
+    setFilteredInventory(filtered)
+  }
+
+  React.useEffect(() => {
+    filterInventory()
+  }, [searchTerm, categoryFilter, statusFilter, supplierFilter, inventory])
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value)
+  }
+
+  const handleCategoryFilter = () => {
+    const categories = ["All Categories", "Cleaning Supplies", "Equipment"]
+    const currentIndex = categories.indexOf(categoryFilter)
+    const nextIndex = (currentIndex + 1) % categories.length
+    setCategoryFilter(categories[nextIndex])
+    toast({ title: "Filter updated", description: `Filtering by category: ${categories[nextIndex]}` })
+  }
+
+  const handleStatusFilter = () => {
+    const statuses = ["All Status", "In Stock", "Low Stock", "Out of Stock"]
+    const currentIndex = statuses.indexOf(statusFilter)
+    const nextIndex = (currentIndex + 1) % statuses.length
+    setStatusFilter(statuses[nextIndex])
+    toast({ title: "Filter updated", description: `Filtering by status: ${statuses[nextIndex]}` })
+  }
+
+  const handleSupplierFilter = () => {
+    const suppliers = ["All Suppliers", "CleanCorp Inc", "Supply Plus", "Equipment World"]
+    const currentIndex = suppliers.indexOf(supplierFilter)
+    const nextIndex = (currentIndex + 1) % suppliers.length
+    setSupplierFilter(suppliers[nextIndex])
+    toast({ title: "Filter updated", description: `Filtering by supplier: ${suppliers[nextIndex]}` })
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({ ...prev, [e.target.id]: e.target.value }))
+  }
+
+  const handleSelectChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  const handleEditItem = (item: typeof initialInventory[0]) => {
+    setIsEditMode(true)
+    setEditingItem(item)
+    setFormData({
+      name: item.name,
+      category: item.category,
+      currentStock: item.currentStock.toString(),
+      minStock: item.minStock.toString(),
+      maxStock: item.maxStock.toString(),
+      unit: item.unit,
+      costPerUnit: item.costPerUnit.toString(),
+      supplier: item.supplier
+    })
+    setIsModalOpen(true)
+  }
+
+  const handleDeleteItem = async (itemId: number, itemName: string) => {
+    setIsLoading(true)
+    setTimeout(() => {
+      setInventory(prev => prev.filter(item => item.id !== itemId))
+      setIsLoading(false)
+      toast({ title: "Item removed", description: `${itemName} has been removed from inventory.`, variant: "destructive" })
+    }, 1000)
+  }
+
+  const handleReorderItem = (item: typeof initialInventory[0]) => {
+    toast({
+      title: "Reorder Initiated",
+      description: `Reorder request sent for ${item.name}. Expected delivery in 3-5 business days.`,
+    })
+  }
+
+  const resetForm = () => {
+    setFormData({ name: "", category: "", currentStock: "", minStock: "", maxStock: "", unit: "", costPerUnit: "", supplier: "" })
+    setIsEditMode(false)
+    setEditingItem(null)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+
+    setTimeout(() => {
+      if (isEditMode && editingItem) {
+        setInventory(prev => prev.map(item => 
+          item.id === editingItem.id 
+            ? {
+                ...item,
+                name: formData.name,
+                category: formData.category,
+                currentStock: parseInt(formData.currentStock),
+                minStock: parseInt(formData.minStock),
+                maxStock: parseInt(formData.maxStock),
+                unit: formData.unit,
+                costPerUnit: parseFloat(formData.costPerUnit),
+                supplier: formData.supplier,
+                status: getStockStatus(parseInt(formData.currentStock), parseInt(formData.minStock))
+              }
+            : item
+        ))
+        toast({ title: "Item updated successfully", description: `${formData.name} has been updated.` })
+      } else {
+        const newItem = {
+          id: Math.max(...inventory.map(i => i.id)) + 1,
+          name: formData.name,
+          category: formData.category,
+          currentStock: parseInt(formData.currentStock),
+          minStock: parseInt(formData.minStock),
+          maxStock: parseInt(formData.maxStock),
+          unit: formData.unit,
+          costPerUnit: parseFloat(formData.costPerUnit),
+          supplier: formData.supplier,
+          lastRestocked: new Date().toISOString().split('T')[0],
+          status: getStockStatus(parseInt(formData.currentStock), parseInt(formData.minStock))
+        }
+        setInventory(prev => [...prev, newItem])
+        toast({ title: "Item added successfully", description: `${formData.name} has been added to inventory.` })
+      }
+      resetForm()
+      setIsModalOpen(false)
+      setIsLoading(false)
+    }, 1000)
+  }
+
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1 p-6">
+    <Layout>
+      <div className="p-6">
           <div className="max-w-7xl mx-auto space-y-6">
-            {/* Header Section */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div>
-                <h1 className="text-3xl font-bold font-heading">Inventory Management</h1>
-                <p className="text-muted-foreground">Track supplies, equipment, and stock levels</p>
-              </div>
-              <Button variant="hero" size="lg">
+            {/* Hero Section */}
+            <HeroSection
+              title="Inventory Management"
+              description="Track your cleaning supplies, equipment, and stock levels. Never run out of essentials and maintain optimal inventory levels."
+              imageUrl="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&h=400&fit=crop"
+              imageAlt="Cleaning supplies"
+            >
+              <Button variant="hero" size="lg" onClick={() => setIsModalOpen(true)}>
                 <Plus className="h-4 w-4" />
                 Add Item
               </Button>
-            </div>
+            </HeroSection>
 
             {/* Search and Filters */}
             <Card>
@@ -100,12 +268,14 @@ export default function Inventory() {
                     <Input
                       placeholder="Search inventory by name, category, or supplier..."
                       className="pl-10"
+                      value={searchTerm}
+                      onChange={handleSearch}
                     />
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="outline">All Categories</Button>
-                    <Button variant="outline">All Status</Button>
-                    <Button variant="outline">All Suppliers</Button>
+                    <Button variant="outline" onClick={handleCategoryFilter}>{categoryFilter}</Button>
+                    <Button variant="outline" onClick={handleStatusFilter}>{statusFilter}</Button>
+                    <Button variant="outline" onClick={handleSupplierFilter}>{supplierFilter}</Button>
                   </div>
                 </div>
               </CardContent>
@@ -196,7 +366,7 @@ export default function Inventory() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {inventory.map((item) => (
+                        {filteredInventory.map((item) => (
                           <TableRow key={item.id}>
                             <TableCell>
                               <div className="flex items-center gap-3">
@@ -241,12 +411,30 @@ export default function Inventory() {
                             <TableCell>{item.lastRestocked}</TableCell>
                             <TableCell>
                               <div className="flex gap-2">
-                                <Button variant="ghost" size="icon">
+                                <Button variant="ghost" size="icon" onClick={() => handleEditItem(item)} disabled={isLoading}>
                                   <Edit className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="icon">
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button variant="ghost" size="icon" disabled={isLoading}>
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Delete Item</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Are you sure you want to remove {item.name} from inventory? This action cannot be undone.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogAction onClick={() => handleDeleteItem(item.id, item.name)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                        {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Deleting...</> : "Delete Item"}
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
                               </div>
                             </TableCell>
                           </TableRow>
@@ -259,7 +447,7 @@ export default function Inventory() {
 
               <TabsContent value="cards">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {inventory.map((item) => (
+                  {filteredInventory.map((item) => (
                     <Card key={item.id}>
                       <CardContent className="p-6">
                         <div className="flex items-start justify-between mb-4">
@@ -317,13 +505,30 @@ export default function Inventory() {
                         </div>
                         
                         <div className="flex gap-2 mt-4">
-                          <Button variant="outline" size="sm" className="flex-1">
-                            <Edit className="h-3 w-3" />
-                            Edit
+                          <Button variant="outline" size="sm" className="flex-1" onClick={() => handleEditItem(item)} disabled={isLoading}>
+                            <Edit className="h-3 w-3 mr-2" />Edit
                           </Button>
-                          <Button variant="outline" size="sm">
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="outline" size="sm" disabled={isLoading}>
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Item</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to remove {item.name} from inventory?
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDeleteItem(item.id, item.name)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                  Delete Item
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
                       </CardContent>
                     </Card>
@@ -357,8 +562,12 @@ export default function Inventory() {
                               </div>
                             </div>
                             <div className="flex gap-2">
-                              <Button variant="outline" size="sm">Reorder</Button>
-                              <Button variant="outline" size="sm">Edit</Button>
+                              <Button variant="outline" size="sm" onClick={() => handleReorderItem(item)} disabled={isLoading}>
+                                <ShoppingCart className="h-3 w-3 mr-1" />Reorder
+                              </Button>
+                              <Button variant="outline" size="sm" onClick={() => handleEditItem(item)} disabled={isLoading}>
+                                <Edit className="h-3 w-3 mr-1" />Edit
+                              </Button>
                             </div>
                           </div>
                         ))}
@@ -369,8 +578,80 @@ export default function Inventory() {
               </TabsContent>
             </Tabs>
           </div>
-        </main>
       </div>
-    </div>
+
+        {/* Add/Edit Item Modal */}
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogContent className="sm:max-w-[525px]">
+            <DialogHeader>
+              <DialogTitle>{isEditMode ? "Edit Inventory Item" : "Add New Item"}</DialogTitle>
+              <DialogDescription>
+                {isEditMode ? "Update the inventory item details." : "Add a new item to your inventory."}
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleSubmit}>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Item Name</Label>
+                  <Input id="name" placeholder="All-Purpose Cleaner" value={formData.name} onChange={handleInputChange} required disabled={isLoading} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="category">Category</Label>
+                    <Select value={formData.category} onValueChange={(value) => handleSelectChange("category", value)} disabled={isLoading}>
+                      <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Cleaning Supplies">Cleaning Supplies</SelectItem>
+                        <SelectItem value="Equipment">Equipment</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="unit">Unit</Label>
+                    <Input id="unit" placeholder="bottles, packs, boxes" value={formData.unit} onChange={handleInputChange} required disabled={isLoading} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="currentStock">Current Stock</Label>
+                    <Input id="currentStock" type="number" value={formData.currentStock} onChange={handleInputChange} required disabled={isLoading} />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="minStock">Min Stock</Label>
+                    <Input id="minStock" type="number" value={formData.minStock} onChange={handleInputChange} required disabled={isLoading} />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="maxStock">Max Stock</Label>
+                    <Input id="maxStock" type="number" value={formData.maxStock} onChange={handleInputChange} required disabled={isLoading} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="costPerUnit">Cost Per Unit ($)</Label>
+                    <Input id="costPerUnit" type="number" step="0.01" value={formData.costPerUnit} onChange={handleInputChange} required disabled={isLoading} />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="supplier">Supplier</Label>
+                    <Select value={formData.supplier} onValueChange={(value) => handleSelectChange("supplier", value)} disabled={isLoading}>
+                      <SelectTrigger><SelectValue placeholder="Select supplier" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="CleanCorp Inc">CleanCorp Inc</SelectItem>
+                        <SelectItem value="Supply Plus">Supply Plus</SelectItem>
+                        <SelectItem value="Equipment World">Equipment World</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => { setIsModalOpen(false); resetForm() }} disabled={isLoading}>Cancel</Button>
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{isEditMode ? "Updating..." : "Adding..."}</> : (isEditMode ? "Update Item" : "Add Item")}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+    </Layout>
   )
 }
