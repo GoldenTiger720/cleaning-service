@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { HeroSection } from "@/components/ui/hero-section"
+import { ResponsiveTable } from "@/components/ui/responsive-table"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { Label } from "@/components/ui/label"
@@ -26,7 +27,7 @@ const initialEmployees = [
     status: "Active",
     location: "Downtown",
     hireDate: "2023-01-15",
-    avatar: "/placeholder.svg"
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop"
   },
   {
     id: 2,
@@ -37,7 +38,7 @@ const initialEmployees = [
     status: "Active",
     location: "Uptown",
     hireDate: "2023-03-22",
-    avatar: "/placeholder.svg"
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop"
   },
   {
     id: 3,
@@ -48,7 +49,7 @@ const initialEmployees = [
     status: "On Leave",
     location: "Midtown",
     hireDate: "2022-11-08",
-    avatar: "/placeholder.svg"
+    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop"
   }
 ]
 
@@ -225,7 +226,7 @@ export default function Employees() {
           status: "Active" as const,
           location: formData.location,
           hireDate: new Date().toISOString().split('T')[0],
-          avatar: "/placeholder.svg"
+          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name)}&background=random&size=150`
         }
 
         setEmployees(prev => [...prev, newEmployee])
@@ -245,8 +246,8 @@ export default function Employees() {
 
   return (
     <Layout>
-      <div className="p-6">
-        <div className="max-w-7xl mx-auto space-y-6">
+      <div className="p-4 sm:p-6">
+        <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
             {/* Hero Section */}
             <HeroSection
               title="Employee Management"
@@ -262,7 +263,7 @@ export default function Employees() {
 
             {/* Search and Filters */}
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -273,7 +274,7 @@ export default function Employees() {
                       onChange={handleSearch}
                     />
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <Button variant="outline" onClick={handleRoleFilter}>{roleFilter}</Button>
                     <Button variant="outline" onClick={handleLocationFilter}>{locationFilter}</Button>
                     <Button variant="outline" onClick={handleStatusFilter}>{statusFilter}</Button>
@@ -283,55 +284,55 @@ export default function Employees() {
             </Card>
 
             {/* Employee Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-primary/10 rounded-lg">
                       <Calendar className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Total Employees</p>
-                      <p className="text-2xl font-bold">24</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">Total Employees</p>
+                      <p className="text-xl sm:text-2xl font-bold">24</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-success/10 rounded-lg">
                       <Calendar className="h-5 w-5 text-success" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Active</p>
-                      <p className="text-2xl font-bold">22</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">Active</p>
+                      <p className="text-xl sm:text-2xl font-bold">22</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-warning/10 rounded-lg">
                       <Calendar className="h-5 w-5 text-warning" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">On Leave</p>
-                      <p className="text-2xl font-bold">2</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">On Leave</p>
+                      <p className="text-xl sm:text-2xl font-bold">2</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-accent/10 rounded-lg">
                       <Calendar className="h-5 w-5 text-accent" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">New This Month</p>
-                      <p className="text-2xl font-bold">3</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">New This Month</p>
+                      <p className="text-xl sm:text-2xl font-bold">3</p>
                     </div>
                   </div>
                 </CardContent>
@@ -339,7 +340,7 @@ export default function Employees() {
             </div>
 
             {/* Employee List */}
-            <Tabs defaultValue="list" className="space-y-6">
+            <Tabs defaultValue="list" className="space-y-4 sm:space-y-6">
               <TabsList>
                 <TabsTrigger value="list">List View</TabsTrigger>
                 <TabsTrigger value="cards">Card View</TabsTrigger>
@@ -352,7 +353,8 @@ export default function Employees() {
                     <CardDescription>Comprehensive list of all team members</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Table>
+                    <ResponsiveTable>
+                  <Table>
                       <TableHeader>
                         <TableRow>
                           <TableHead>Employee</TableHead>
@@ -403,7 +405,7 @@ export default function Employees() {
                             </TableCell>
                             <TableCell>{employee.hireDate}</TableCell>
                             <TableCell>
-                              <div className="flex gap-2">
+                              <div className="flex flex-col sm:flex-row gap-2">
                                 <Button 
                                   variant="ghost" 
                                   size="icon"
@@ -449,15 +451,16 @@ export default function Employees() {
                         ))}
                       </TableBody>
                     </Table>
+                  </ResponsiveTable>
                   </CardContent>
                 </Card>
               </TabsContent>
 
               <TabsContent value="cards">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {filteredEmployees.map((employee) => (
                     <Card key={employee.id}>
-                      <CardContent className="p-6">
+                      <CardContent className="p-4 sm:p-6">
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex items-center gap-3">
                             <Avatar className="h-12 w-12">
@@ -493,7 +496,7 @@ export default function Employees() {
                             Hired: {employee.hireDate}
                           </div>
                         </div>
-                        <div className="flex gap-2 mt-4">
+                        <div className="flex flex-col sm:flex-row gap-2 mt-4">
                           <Button 
                             variant="outline" 
                             size="sm" 
@@ -547,7 +550,7 @@ export default function Employees() {
 
         {/* Add Employee Modal */}
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>{isEditMode ? "Edit Employee" : "Add New Employee"}</DialogTitle>
               <DialogDescription>

@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { ResponsiveTable } from "@/components/ui/responsive-table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
@@ -27,7 +28,7 @@ const timeEntries = [
     status: "Completed",
     task: "Office cleaning - 3rd floor",
     hourlyRate: 25.00,
-    avatar: "/placeholder.svg"
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop"
   },
   {
     id: 2,
@@ -40,7 +41,7 @@ const timeEntries = [
     status: "Completed",
     task: "House cleaning - Living areas",
     hourlyRate: 22.00,
-    avatar: "/placeholder.svg"
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop"
   },
   {
     id: 3,
@@ -53,7 +54,7 @@ const timeEntries = [
     status: "In Progress",
     task: "Commercial cleaning - Lobby",
     hourlyRate: 28.00,
-    avatar: "/placeholder.svg"
+    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop"
   }
 ]
 
@@ -97,8 +98,8 @@ export default function TimeTracking() {
 
   return (
     <Layout>
-      <div className="p-6">
-          <div className="max-w-7xl mx-auto space-y-6">
+      <div className="p-4 sm:p-6">
+          <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
             {/* Hero Section */}
             <HeroSection
               title="Time Tracking"
@@ -114,7 +115,7 @@ export default function TimeTracking() {
 
             {/* Search and Filters */}
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -123,7 +124,7 @@ export default function TimeTracking() {
                       className="pl-10"
                     />
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <Button variant="outline">
                       <Filter className="h-4 w-4" />
                       All Employees
@@ -136,16 +137,16 @@ export default function TimeTracking() {
             </Card>
 
             {/* Time Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-primary/10 rounded-lg">
                       <Clock className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Today's Hours</p>
-                      <p className="text-2xl font-bold">28.5</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">Today's Hours</p>
+                      <p className="text-xl sm:text-2xl font-bold">28.5</p>
                       <p className="text-xs text-success flex items-center gap-1">
                         <TrendingUp className="h-3 w-3" />
                         +2.5 from yesterday
@@ -155,40 +156,40 @@ export default function TimeTracking() {
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-success/10 rounded-lg">
                       <Calendar className="h-5 w-5 text-success" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">This Week</p>
-                      <p className="text-2xl font-bold">142</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">This Week</p>
+                      <p className="text-xl sm:text-2xl font-bold">142</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-accent/10 rounded-lg">
                       <Users className="h-5 w-5 text-accent" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Active Now</p>
-                      <p className="text-2xl font-bold">3</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">Active Now</p>
+                      <p className="text-xl sm:text-2xl font-bold">3</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-warning/10 rounded-lg">
                       <TrendingUp className="h-5 w-5 text-warning" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Avg Efficiency</p>
-                      <p className="text-2xl font-bold">96%</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">Avg Efficiency</p>
+                      <p className="text-xl sm:text-2xl font-bold">96%</p>
                     </div>
                   </div>
                 </CardContent>
@@ -196,7 +197,7 @@ export default function TimeTracking() {
             </div>
 
             {/* Main Content */}
-            <Tabs defaultValue="current" className="space-y-6">
+            <Tabs defaultValue="current" className="space-y-4 sm:space-y-6">
               <TabsList>
                 <TabsTrigger value="current">Current Activity</TabsTrigger>
                 <TabsTrigger value="history">Time History</TabsTrigger>
@@ -204,7 +205,7 @@ export default function TimeTracking() {
               </TabsList>
 
               <TabsContent value="current">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                   {/* Active Sessions */}
                   <Card>
                     <CardHeader>
@@ -227,7 +228,7 @@ export default function TimeTracking() {
                                 <p className="text-sm text-primary">Started at {entry.startTime}</p>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex flex-col sm:flex-row items-center gap-2">
                               <Button variant="outline" size="sm">
                                 <Pause className="h-3 w-3" />
                                 Pause
@@ -281,6 +282,7 @@ export default function TimeTracking() {
                     <CardDescription>Complete record of all logged hours</CardDescription>
                   </CardHeader>
                   <CardContent>
+                    <ResponsiveTable>
                     <Table>
                       <TableHeader>
                         <TableRow>
@@ -329,6 +331,7 @@ export default function TimeTracking() {
                         ))}
                       </TableBody>
                     </Table>
+                    </ResponsiveTable>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -346,7 +349,7 @@ export default function TimeTracking() {
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <Avatar>
-                                <AvatarImage src="/placeholder.svg" />
+                                <AvatarImage src={`https://ui-avatars.com/api/?name=${encodeURIComponent(stat.employee)}&background=random&size=150`} />
                                 <AvatarFallback>{stat.employee.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                               </Avatar>
                               <div>

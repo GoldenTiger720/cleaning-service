@@ -18,10 +18,10 @@ import dashboardBg from "@/assets/dashboard-bg.jpg"
 const Index = () => {
   return (
     <Layout>
-      <div className="p-6 space-y-6">
+      <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
           {/* Hero Section */}
           <div 
-            className="relative rounded-xl overflow-hidden bg-gradient-hero text-white p-8"
+            className="relative rounded-xl overflow-hidden bg-gradient-hero text-white p-4 sm:p-8"
             style={{
               backgroundImage: `linear-gradient(135deg, rgba(0, 154, 255, 0.9), rgba(34, 197, 94, 0.8)), url(${heroImage})`,
               backgroundSize: 'cover',
@@ -29,17 +29,17 @@ const Index = () => {
             }}
           >
             <div className="relative z-10">
-              <h1 className="text-3xl font-bold font-heading mb-2">
+              <h1 className="text-2xl sm:text-3xl font-bold font-heading mb-2">
                 Welcome to CleanPro Management
               </h1>
-              <p className="text-xl opacity-90 mb-6">
+              <p className="text-base sm:text-xl opacity-90 mb-4 sm:mb-6">
                 Streamline your cleaning business operations with our comprehensive platform
               </p>
-              <div className="flex gap-4">
-                <button className="bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 text-white font-semibold py-3 px-6 rounded-lg transition-smooth">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <button className="bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 text-white font-semibold py-2 px-4 sm:py-3 sm:px-6 rounded-lg transition-smooth text-sm sm:text-base">
                   Schedule New Job
                 </button>
-                <button className="bg-white text-primary font-semibold py-3 px-6 rounded-lg hover:bg-white/90 transition-smooth">
+                <button className="bg-white text-primary font-semibold py-2 px-4 sm:py-3 sm:px-6 rounded-lg hover:bg-white/90 transition-smooth text-sm sm:text-base">
                   View Reports
                 </button>
               </div>
@@ -47,7 +47,7 @@ const Index = () => {
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <StatsCard
               title="Active Employees"
               value={24}
@@ -83,7 +83,7 @@ const Index = () => {
           </div>
 
           {/* Secondary Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <StatsCard
               title="Hours Logged"
               value="1,247"
@@ -123,7 +123,7 @@ const Index = () => {
           </div>
 
           {/* Main Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             <div className="lg:col-span-2">
               <RecentJobs />
             </div>

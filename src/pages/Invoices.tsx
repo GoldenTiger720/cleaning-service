@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { ResponsiveTable } from "@/components/ui/responsive-table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
 import { Search, Plus, Download, Send, Eye, Edit, FileText, DollarSign, Clock, CheckCircle, Loader2, Trash2 } from "lucide-react"
@@ -117,8 +118,8 @@ export default function Invoices() {
 
   return (
     <Layout>
-      <div className="p-6">
-          <div className="max-w-7xl mx-auto space-y-6">
+      <div className="p-4 sm:p-6">
+          <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
             {/* Hero Section */}
             <HeroSection
               title="Invoice Management"
@@ -126,7 +127,7 @@ export default function Invoices() {
               imageUrl="https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=1600&h=400&fit=crop"
               imageAlt="Documents and paperwork"
             >
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Button variant="outline" size="lg" onClick={handleExport}>
                   <Download className="h-4 w-4" />
                   Export
@@ -140,7 +141,7 @@ export default function Invoices() {
 
             {/* Search and Filters */}
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -149,7 +150,7 @@ export default function Invoices() {
                       className="pl-10"
                     />
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <Button variant="outline">All Status</Button>
                     <Button variant="outline">This Month</Button>
                     <Button variant="outline">All Customers</Button>
@@ -159,55 +160,55 @@ export default function Invoices() {
             </Card>
 
             {/* Invoice Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-primary/10 rounded-lg">
                       <FileText className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Total Invoices</p>
-                      <p className="text-2xl font-bold">247</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">Total Invoices</p>
+                      <p className="text-xl sm:text-2xl font-bold">247</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-success/10 rounded-lg">
                       <CheckCircle className="h-5 w-5 text-success" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Paid</p>
-                      <p className="text-2xl font-bold">189</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">Paid</p>
+                      <p className="text-xl sm:text-2xl font-bold">189</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-warning/10 rounded-lg">
                       <Send className="h-5 w-5 text-warning" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Sent</p>
-                      <p className="text-2xl font-bold">45</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">Sent</p>
+                      <p className="text-xl sm:text-2xl font-bold">45</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-destructive/10 rounded-lg">
                       <Clock className="h-5 w-5 text-destructive" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Overdue</p>
-                      <p className="text-2xl font-bold">13</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">Overdue</p>
+                      <p className="text-xl sm:text-2xl font-bold">13</p>
                     </div>
                   </div>
                 </CardContent>
@@ -215,7 +216,7 @@ export default function Invoices() {
             </div>
 
             {/* Invoice List */}
-            <Tabs defaultValue="all" className="space-y-6">
+            <Tabs defaultValue="all" className="space-y-4 sm:space-y-6">
               <TabsList>
                 <TabsTrigger value="all">All Invoices</TabsTrigger>
                 <TabsTrigger value="draft">Drafts</TabsTrigger>
@@ -231,6 +232,7 @@ export default function Invoices() {
                     <CardDescription>Complete list of all invoices</CardDescription>
                   </CardHeader>
                   <CardContent>
+                    <ResponsiveTable>
                     <Table>
                       <TableHeader>
                         <TableRow>
@@ -278,7 +280,7 @@ export default function Invoices() {
                                 </span>
                               </TableCell>
                               <TableCell>
-                                <div className="flex gap-2">
+                                <div className="flex flex-col sm:flex-row gap-2">
                                   <Button variant="ghost" size="icon">
                                     <Eye className="h-4 w-4" />
                                   </Button>
@@ -300,6 +302,7 @@ export default function Invoices() {
                         })}
                       </TableBody>
                     </Table>
+                    </ResponsiveTable>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -326,7 +329,7 @@ export default function Invoices() {
                           </div>
                           <div className="flex items-center gap-4">
                             <p className="font-medium">${invoice.amount.toFixed(2)}</p>
-                            <div className="flex gap-2">
+                            <div className="flex flex-col sm:flex-row gap-2">
                               <Button variant="outline" size="sm">
                                 <Edit className="h-3 w-3" />
                                 Edit
@@ -366,7 +369,7 @@ export default function Invoices() {
                           </div>
                           <div className="flex items-center gap-4">
                             <p className="font-medium">${invoice.amount.toFixed(2)}</p>
-                            <div className="flex gap-2">
+                            <div className="flex flex-col sm:flex-row gap-2">
                               <Button variant="outline" size="sm">View</Button>
                               <Button variant="outline" size="sm">Resend</Button>
                               <Button variant="outline" size="sm">Record Payment</Button>
@@ -401,7 +404,7 @@ export default function Invoices() {
                           </div>
                           <div className="flex items-center gap-4">
                             <p className="font-medium">${invoice.amount.toFixed(2)}</p>
-                            <div className="flex gap-2">
+                            <div className="flex flex-col sm:flex-row gap-2">
                               <Button variant="outline" size="sm">
                                 <Eye className="h-3 w-3" />
                                 View
@@ -441,7 +444,7 @@ export default function Invoices() {
                           </div>
                           <div className="flex items-center gap-4">
                             <p className="font-medium text-destructive">${invoice.amount.toFixed(2)}</p>
-                            <div className="flex gap-2">
+                            <div className="flex flex-col sm:flex-row gap-2">
                               <Button variant="outline" size="sm">Send Reminder</Button>
                               <Button variant="outline" size="sm">Contact Customer</Button>
                               <Button variant="outline" size="sm">Record Payment</Button>

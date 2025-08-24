@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { ResponsiveTable } from "@/components/ui/responsive-table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
@@ -217,8 +218,8 @@ export default function Payments() {
 
   return (
     <Layout>
-      <div className="p-6">
-          <div className="max-w-7xl mx-auto space-y-6">
+      <div className="p-4 sm:p-6">
+          <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
             {/* Hero Section */}
             <HeroSection
               title="Payment Management"
@@ -226,7 +227,7 @@ export default function Payments() {
               imageUrl="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1600&h=400&fit=crop"
               imageAlt="Financial money management"
             >
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Button variant="outline" size="lg" onClick={handleExport} disabled={isLoading}>
                   <Download className="h-4 w-4" />
                   Export
@@ -240,7 +241,7 @@ export default function Payments() {
 
             {/* Search and Filters */}
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -251,7 +252,7 @@ export default function Payments() {
                       onChange={handleSearch}
                     />
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <Button variant="outline" onClick={handleStatusFilter}>
                       <Filter className="h-4 w-4" />
                       {statusFilter}
@@ -264,16 +265,16 @@ export default function Payments() {
             </Card>
 
             {/* Payment Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-primary/10 rounded-lg">
                       <DollarSign className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Total Revenue</p>
-                      <p className="text-2xl font-bold">$24,850</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">Total Revenue</p>
+                      <p className="text-xl sm:text-2xl font-bold">$24,850</p>
                       <p className="text-xs text-success flex items-center gap-1">
                         <TrendingUp className="h-3 w-3" />
                         +12% from last month
@@ -283,40 +284,40 @@ export default function Payments() {
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-success/10 rounded-lg">
                       <CreditCard className="h-5 w-5 text-success" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Paid This Month</p>
-                      <p className="text-2xl font-bold">$18,450</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">Paid This Month</p>
+                      <p className="text-xl sm:text-2xl font-bold">$18,450</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-warning/10 rounded-lg">
                       <Clock className="h-5 w-5 text-warning" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Pending</p>
-                      <p className="text-2xl font-bold">$3,200</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">Pending</p>
+                      <p className="text-xl sm:text-2xl font-bold">$3,200</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-destructive/10 rounded-lg">
                       <Clock className="h-5 w-5 text-destructive" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Overdue</p>
-                      <p className="text-2xl font-bold">$3,200</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">Overdue</p>
+                      <p className="text-xl sm:text-2xl font-bold">$3,200</p>
                     </div>
                   </div>
                 </CardContent>
@@ -324,7 +325,7 @@ export default function Payments() {
             </div>
 
             {/* Payment List */}
-            <Tabs defaultValue="all" className="space-y-6">
+            <Tabs defaultValue="all" className="space-y-4 sm:space-y-6">
               <TabsList>
                 <TabsTrigger value="all">All Payments</TabsTrigger>
                 <TabsTrigger value="paid">Paid</TabsTrigger>
@@ -339,6 +340,7 @@ export default function Payments() {
                     <CardDescription>Complete record of all financial transactions</CardDescription>
                   </CardHeader>
                   <CardContent>
+                    <ResponsiveTable>
                     <Table>
                       <TableHeader>
                         <TableRow>
@@ -392,7 +394,7 @@ export default function Payments() {
                               {payment.status === "Paid" ? payment.date : "-"}
                             </TableCell>
                             <TableCell>
-                              <div className="flex gap-2">
+                              <div className="flex flex-col sm:flex-row gap-2">
                                 <Button variant="outline" size="sm" onClick={() => handleViewPayment(payment.id)} disabled={isLoading}>
                                   <FileText className="h-3 w-3 mr-1" />View
                                 </Button>
@@ -407,6 +409,7 @@ export default function Payments() {
                         ))}
                       </TableBody>
                     </Table>
+                    </ResponsiveTable>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -463,7 +466,7 @@ export default function Payments() {
                           </div>
                           <div className="text-right">
                             <p className="font-medium">${payment.amount.toFixed(2)}</p>
-                            <div className="flex gap-2 mt-2">
+                            <div className="flex flex-col sm:flex-row gap-2 mt-2">
                               <Button variant="outline" size="sm" onClick={() => handleSendReminder(payment.customer)} disabled={isLoading}>
                                 <Send className="h-3 w-3 mr-1" />Send Reminder
                               </Button>
@@ -501,7 +504,7 @@ export default function Payments() {
                           </div>
                           <div className="text-right">
                             <p className="font-medium text-destructive">${payment.amount.toFixed(2)}</p>
-                            <div className="flex gap-2 mt-2">
+                            <div className="flex flex-col sm:flex-row gap-2 mt-2">
                               <Button variant="outline" size="sm" onClick={() => handleContactCustomer(payment.customer)} disabled={isLoading}>
                                 <Phone className="h-3 w-3 mr-1" />Contact Customer
                               </Button>
@@ -522,7 +525,7 @@ export default function Payments() {
 
         {/* New Payment Modal */}
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogContent className="sm:max-w-[525px]">
+          <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-[525px]">
             <DialogHeader>
               <DialogTitle>Record New Payment</DialogTitle>
               <DialogDescription>
@@ -530,7 +533,7 @@ export default function Payments() {
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleAddPayment}>
-              <div className="grid gap-4 py-4">
+              <div className="grid gap-3 sm:gap-4 py-4">
                 <div className="grid gap-2">
                   <Label htmlFor="customer">Customer Name</Label>
                   <Input
@@ -553,7 +556,7 @@ export default function Payments() {
                     disabled={isLoading}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="amount">Amount ($)</Label>
                     <Input

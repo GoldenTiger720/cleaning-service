@@ -1,4 +1,4 @@
-import { Bell, Search, User, LogOut } from "lucide-react"
+import { Bell, Search, User, LogOut, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -13,7 +13,11 @@ import {
 import { useNavigate } from "react-router-dom"
 import { useToast } from "@/hooks/use-toast"
 
-export function Header() {
+interface HeaderProps {
+  onMenuClick?: () => void
+}
+
+export function Header({ onMenuClick }: HeaderProps) {
   const navigate = useNavigate()
   const { toast } = useToast()
 
@@ -35,23 +39,31 @@ export function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-full items-center justify-between px-6">
-        {/* Logo and Brand */}
-        <div className="flex items-center gap-3">
+      <div className="flex h-full items-center justify-between px-4 sm:px-6">
+        {/* Mobile Menu Button and Logo */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={onMenuClick}
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary">
             <span className="text-sm font-bold text-white">CP</span>
           </div>
-          <div>
-            <h1 className="text-lg font-bold font-heading">CleanPro</h1>
+          <div className="hidden sm:block">
+            <h1 className="text-base sm:text-lg font-bold font-heading">CleanPro</h1>
             <p className="text-xs text-muted-foreground">Management System</p>
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="relative flex-1 max-w-md mx-8">
+        {/* Search Bar - Hidden on mobile */}
+        <div className="relative flex-1 max-w-md mx-4 sm:mx-8 hidden md:block">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search employees, customers, schedules..."
+            placeholder="Search..."
             className="pl-10 bg-muted/50"
           />
         </div>

@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { ResponsiveTable } from "@/components/ui/responsive-table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -244,8 +245,8 @@ export default function Inventory() {
 
   return (
     <Layout>
-      <div className="p-6">
-          <div className="max-w-7xl mx-auto space-y-6">
+      <div className="p-4 sm:p-6">
+          <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
             {/* Hero Section */}
             <HeroSection
               title="Inventory Management"
@@ -261,7 +262,7 @@ export default function Inventory() {
 
             {/* Search and Filters */}
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -272,7 +273,7 @@ export default function Inventory() {
                       onChange={handleSearch}
                     />
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <Button variant="outline" onClick={handleCategoryFilter}>{categoryFilter}</Button>
                     <Button variant="outline" onClick={handleStatusFilter}>{statusFilter}</Button>
                     <Button variant="outline" onClick={handleSupplierFilter}>{supplierFilter}</Button>
@@ -282,55 +283,55 @@ export default function Inventory() {
             </Card>
 
             {/* Inventory Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-primary/10 rounded-lg">
                       <Package className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Total Items</p>
-                      <p className="text-2xl font-bold">84</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">Total Items</p>
+                      <p className="text-xl sm:text-2xl font-bold">84</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-destructive/10 rounded-lg">
                       <AlertTriangle className="h-5 w-5 text-destructive" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Low Stock</p>
-                      <p className="text-2xl font-bold">12</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">Low Stock</p>
+                      <p className="text-xl sm:text-2xl font-bold">12</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-warning/10 rounded-lg">
                       <TrendingDown className="h-5 w-5 text-warning" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Out of Stock</p>
-                      <p className="text-2xl font-bold">3</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">Out of Stock</p>
+                      <p className="text-xl sm:text-2xl font-bold">3</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-success/10 rounded-lg">
                       <TrendingUp className="h-5 w-5 text-success" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Total Value</p>
-                      <p className="text-2xl font-bold">$8,450</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">Total Value</p>
+                      <p className="text-xl sm:text-2xl font-bold">$8,450</p>
                     </div>
                   </div>
                 </CardContent>
@@ -338,7 +339,7 @@ export default function Inventory() {
             </div>
 
             {/* Inventory List */}
-            <Tabs defaultValue="list" className="space-y-6">
+            <Tabs defaultValue="list" className="space-y-4 sm:space-y-6">
               <TabsList>
                 <TabsTrigger value="list">List View</TabsTrigger>
                 <TabsTrigger value="cards">Card View</TabsTrigger>
@@ -352,6 +353,7 @@ export default function Inventory() {
                     <CardDescription>Complete list of all inventory items</CardDescription>
                   </CardHeader>
                   <CardContent>
+                    <ResponsiveTable>
                     <Table>
                       <TableHeader>
                         <TableRow>
@@ -441,15 +443,16 @@ export default function Inventory() {
                         ))}
                       </TableBody>
                     </Table>
+                    </ResponsiveTable>
                   </CardContent>
                 </Card>
               </TabsContent>
 
               <TabsContent value="cards">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {filteredInventory.map((item) => (
                     <Card key={item.id}>
-                      <CardContent className="p-6">
+                      <CardContent className="p-4 sm:p-6">
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex items-center gap-3">
                             <div className="p-2 bg-primary/10 rounded-lg">
@@ -582,7 +585,7 @@ export default function Inventory() {
 
         {/* Add/Edit Item Modal */}
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogContent className="sm:max-w-[525px]">
+          <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-[525px]">
             <DialogHeader>
               <DialogTitle>{isEditMode ? "Edit Inventory Item" : "Add New Item"}</DialogTitle>
               <DialogDescription>
@@ -590,12 +593,12 @@ export default function Inventory() {
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit}>
-              <div className="grid gap-4 py-4">
+              <div className="grid gap-3 sm:gap-4 py-4">
                 <div className="grid gap-2">
                   <Label htmlFor="name">Item Name</Label>
                   <Input id="name" placeholder="All-Purpose Cleaner" value={formData.name} onChange={handleInputChange} required disabled={isLoading} />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="category">Category</Label>
                     <Select value={formData.category} onValueChange={(value) => handleSelectChange("category", value)} disabled={isLoading}>
@@ -611,7 +614,7 @@ export default function Inventory() {
                     <Input id="unit" placeholder="bottles, packs, boxes" value={formData.unit} onChange={handleInputChange} required disabled={isLoading} />
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="currentStock">Current Stock</Label>
                     <Input id="currentStock" type="number" value={formData.currentStock} onChange={handleInputChange} required disabled={isLoading} />
@@ -625,7 +628,7 @@ export default function Inventory() {
                     <Input id="maxStock" type="number" value={formData.maxStock} onChange={handleInputChange} required disabled={isLoading} />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="costPerUnit">Cost Per Unit ($)</Label>
                     <Input id="costPerUnit" type="number" step="0.01" value={formData.costPerUnit} onChange={handleInputChange} required disabled={isLoading} />

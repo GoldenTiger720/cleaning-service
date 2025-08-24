@@ -243,8 +243,8 @@ export default function Scheduling() {
 
   return (
     <Layout>
-      <div className="p-6">
-          <div className="max-w-7xl mx-auto space-y-6">
+      <div className="p-4 sm:p-6">
+          <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
             {/* Hero Section */}
             <HeroSection
               title="Schedule Management"
@@ -259,55 +259,55 @@ export default function Scheduling() {
             </HeroSection>
 
             {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-primary/10 rounded-lg">
                       <CalendarIcon className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Today's Jobs</p>
-                      <p className="text-2xl font-bold">8</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">Today's Jobs</p>
+                      <p className="text-xl sm:text-2xl font-bold">8</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-success/10 rounded-lg">
                       <Clock className="h-5 w-5 text-success" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">In Progress</p>
-                      <p className="text-2xl font-bold">3</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">In Progress</p>
+                      <p className="text-xl sm:text-2xl font-bold">3</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-warning/10 rounded-lg">
                       <Users className="h-5 w-5 text-warning" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Teams Active</p>
-                      <p className="text-2xl font-bold">6</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">Teams Active</p>
+                      <p className="text-xl sm:text-2xl font-bold">6</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-accent/10 rounded-lg">
                       <CalendarIcon className="h-5 w-5 text-accent" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">This Week</p>
-                      <p className="text-2xl font-bold">47</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">This Week</p>
+                      <p className="text-xl sm:text-2xl font-bold">47</p>
                     </div>
                   </div>
                 </CardContent>
@@ -315,7 +315,7 @@ export default function Scheduling() {
             </div>
 
             {/* Main Content */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
               {/* Calendar */}
               <Card className="lg:col-span-1">
                 <CardHeader>
@@ -333,16 +333,16 @@ export default function Scheduling() {
               </Card>
 
               {/* Schedule List */}
-              <div className="lg:col-span-2 space-y-6">
+              <div className="lg:col-span-2 space-y-4 sm:space-y-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold">Today's Schedule</h2>
+                  <h2 className="text-lg sm:text-xl font-semibold">Today's Schedule</h2>
                   <Button variant="outline" size="sm" onClick={handleFilter}>
                     <Filter className="h-4 w-4" />
                     Filter by: {statusFilter}
                   </Button>
                 </div>
 
-                <Tabs defaultValue="timeline" className="space-y-4">
+                <Tabs defaultValue="timeline" className="space-y-3 sm:space-y-4">
                   <TabsList>
                     <TabsTrigger value="timeline">Timeline View</TabsTrigger>
                     <TabsTrigger value="list">List View</TabsTrigger>
@@ -351,7 +351,7 @@ export default function Scheduling() {
                   <TabsContent value="timeline" className="space-y-4">
                     {filteredSchedules.map((schedule) => (
                       <Card key={schedule.id}>
-                        <CardContent className="p-6">
+                        <CardContent className="p-4 sm:p-6">
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3">
                               <div className="p-2 bg-primary/10 rounded-lg">
@@ -387,7 +387,7 @@ export default function Scheduling() {
                               <div className="flex -space-x-2">
                                 {schedule.employees.map((employee, index) => (
                                   <Avatar key={index} className="h-6 w-6 border-2 border-background">
-                                    <AvatarImage src="/placeholder.svg" />
+                                    <AvatarImage src={`https://ui-avatars.com/api/?name=${encodeURIComponent(employee)}&background=random&size=150`} />
                                     <AvatarFallback className="text-xs">
                                       {employee.split(' ').map(n => n[0]).join('')}
                                     </AvatarFallback>
@@ -398,7 +398,7 @@ export default function Scheduling() {
                                 {schedule.employees.length} team member{schedule.employees.length > 1 ? 's' : ''}
                               </span>
                             </div>
-                            <div className="flex gap-2 flex-wrap">
+                            <div className="flex flex-col sm:flex-row gap-2">
                               <Button 
                                 variant="outline" 
                                 size="sm"
@@ -501,7 +501,7 @@ export default function Scheduling() {
                                   <div className="flex -space-x-1">
                                     {schedule.employees.slice(0, 3).map((employee, index) => (
                                       <Avatar key={index} className="h-6 w-6 border border-background">
-                                        <AvatarImage src="/placeholder.svg" />
+                                        <AvatarImage src={`https://ui-avatars.com/api/?name=${encodeURIComponent(employee)}&background=random&size=150`} />
                                         <AvatarFallback className="text-xs">
                                           {employee.split(' ').map(n => n[0]).join('')}
                                         </AvatarFallback>
@@ -567,7 +567,7 @@ export default function Scheduling() {
 
         {/* Add/Edit Appointment Modal */}
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogContent className="sm:max-w-[525px]">
+          <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-[525px]">
             <DialogHeader>
               <DialogTitle>{isEditMode ? "Edit Appointment" : "New Appointment"}</DialogTitle>
               <DialogDescription>
@@ -578,7 +578,7 @@ export default function Scheduling() {
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleAddSchedule}>
-              <div className="grid gap-4 py-4">
+              <div className="grid gap-3 sm:gap-4 py-4">
                 <div className="grid gap-2">
                   <Label htmlFor="customer">Customer</Label>
                   <Input
@@ -601,7 +601,7 @@ export default function Scheduling() {
                     disabled={isLoading}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="date">Date</Label>
                     <Input
@@ -625,7 +625,7 @@ export default function Scheduling() {
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="type">Service Type</Label>
                     <Select 

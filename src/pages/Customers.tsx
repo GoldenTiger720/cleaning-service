@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { ResponsiveTable } from "@/components/ui/responsive-table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -29,7 +30,7 @@ const initialCustomers = [
     status: "Active",
     nextService: "2024-01-15",
     totalServices: 24,
-    avatar: "/placeholder.svg"
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop"
   },
   {
     id: 2,
@@ -42,7 +43,7 @@ const initialCustomers = [
     status: "Active",
     nextService: "2024-01-16",
     totalServices: 12,
-    avatar: "/placeholder.svg"
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop"
   },
   {
     id: 3,
@@ -55,7 +56,7 @@ const initialCustomers = [
     status: "Pending",
     nextService: "2024-01-18",
     totalServices: 6,
-    avatar: "/placeholder.svg"
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop"
   }
 ]
 
@@ -242,7 +243,7 @@ export default function Customers() {
           status: formData.status as "Active" | "Pending" | "Inactive",
           nextService: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 7 days from now
           totalServices: 0,
-          avatar: "/placeholder.svg"
+          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name)}&background=random&size=150`
         }
 
         setCustomers(prev => [...prev, newCustomer])
@@ -262,8 +263,8 @@ export default function Customers() {
 
   return (
     <Layout>
-      <div className="p-6">
-          <div className="max-w-7xl mx-auto space-y-6">
+      <div className="p-4 sm:p-6">
+          <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
             {/* Hero Section */}
             <HeroSection
               title="Customer Management"
@@ -279,7 +280,7 @@ export default function Customers() {
 
             {/* Search and Filters */}
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -290,7 +291,7 @@ export default function Customers() {
                       onChange={handleSearch}
                     />
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <Button variant="outline" onClick={handleTypeFilter}>{typeFilter}</Button>
                     <Button variant="outline" onClick={handleStatusFilter}>{statusFilter}</Button>
                     <Button variant="outline" onClick={handleLocationFilter}>{locationFilter}</Button>
@@ -300,55 +301,55 @@ export default function Customers() {
             </Card>
 
             {/* Customer Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-primary/10 rounded-lg">
                       <Building className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Total Customers</p>
-                      <p className="text-2xl font-bold">156</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">Total Customers</p>
+                      <p className="text-xl sm:text-2xl font-bold">156</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-success/10 rounded-lg">
                       <Home className="h-5 w-5 text-success" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Residential</p>
-                      <p className="text-2xl font-bold">98</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">Residential</p>
+                      <p className="text-xl sm:text-2xl font-bold">98</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-accent/10 rounded-lg">
                       <Building className="h-5 w-5 text-accent" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Commercial</p>
-                      <p className="text-2xl font-bold">58</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">Commercial</p>
+                      <p className="text-xl sm:text-2xl font-bold">58</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-warning/10 rounded-lg">
                       <Calendar className="h-5 w-5 text-warning" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">New This Month</p>
-                      <p className="text-2xl font-bold">12</p>
+                      <p className="text-sm sm:text-base text-muted-foreground">New This Month</p>
+                      <p className="text-xl sm:text-2xl font-bold">12</p>
                     </div>
                   </div>
                 </CardContent>
@@ -369,6 +370,7 @@ export default function Customers() {
                     <CardDescription>Complete list of all clients</CardDescription>
                   </CardHeader>
                   <CardContent>
+                    <ResponsiveTable>
                     <Table>
                       <TableHeader>
                         <TableRow>
@@ -473,15 +475,16 @@ export default function Customers() {
                         ))}
                       </TableBody>
                     </Table>
+                    </ResponsiveTable>
                   </CardContent>
                 </Card>
               </TabsContent>
 
               <TabsContent value="cards">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {filteredCustomers.map((customer) => (
                     <Card key={customer.id}>
-                      <CardContent className="p-6">
+                      <CardContent className="p-4 sm:p-6">
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex items-center gap-3">
                             <Avatar className="h-12 w-12">
@@ -579,7 +582,7 @@ export default function Customers() {
 
         {/* Add/Edit Customer Modal */}
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogContent className="sm:max-w-[525px]">
+          <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-[525px]">
             <DialogHeader>
               <DialogTitle>{isEditMode ? "Edit Customer" : "Add New Customer"}</DialogTitle>
               <DialogDescription>
@@ -590,7 +593,7 @@ export default function Customers() {
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleAddCustomer}>
-              <div className="grid gap-4 py-4">
+              <div className="grid gap-3 sm:gap-4 py-4">
                 <div className="grid gap-2">
                   <Label htmlFor="name">Customer Name</Label>
                   <Input

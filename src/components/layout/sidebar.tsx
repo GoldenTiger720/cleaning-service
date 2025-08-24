@@ -25,16 +25,37 @@ const navigation = [
   { name: "Settings", href: "/settings", icon: Settings },
 ]
 
-export function Sidebar() {
+interface SidebarProps {
+  mobile?: boolean
+  onNavigate?: () => void
+}
+
+export function Sidebar({ mobile, onNavigate }: SidebarProps) {
   return (
-    <aside className="hidden md:flex w-64 flex-col bg-card border-r border-border fixed top-16 left-0 bottom-0">
+    <aside className={cn(
+      "w-64 flex-col bg-card border-r border-border",
+      mobile ? "flex h-full" : "hidden md:flex fixed top-16 left-0 bottom-0"
+    )}>
       <div className="flex h-full flex-col">
+        {/* Mobile Header */}
+        {mobile && (
+          <div className="flex items-center gap-3 px-4 py-6 border-b">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary">
+              <span className="text-sm font-bold text-white">CP</span>
+            </div>
+            <div>
+              <h1 className="text-lg font-bold font-heading">CleanPro</h1>
+              <p className="text-xs text-muted-foreground">Management System</p>
+            </div>
+          </div>
+        )}
         <nav className="flex-1 space-y-1 p-4">
           {navigation.map((item) => (
             <NavLink
               key={item.name}
               to={item.href}
               end={item.href === "/"}
+              onClick={onNavigate}
               className={({ isActive }) =>
                 cn(
                   "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-smooth",

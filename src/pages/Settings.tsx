@@ -40,8 +40,8 @@ export default function Settings() {
 
   return (
     <Layout>
-      <div className="p-6">
-          <div className="max-w-4xl mx-auto space-y-6">
+      <div className="p-4 sm:p-6">
+          <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
             {/* Hero Section */}
             <HeroSection
               title="Settings"
@@ -51,8 +51,8 @@ export default function Settings() {
             />
 
             {/* Settings Tabs */}
-            <Tabs defaultValue="company" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-6">
+            <Tabs defaultValue="company" className="space-y-4 sm:space-y-6">
+              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1">
                 <TabsTrigger value="company" className="flex items-center gap-2">
                   <Building className="h-4 w-4" />
                   Company
@@ -86,7 +86,7 @@ export default function Settings() {
                     <CardDescription>Update your company details and preferences</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="company-name">Company Name</Label>
                         <Input id="company-name" defaultValue="CleanPro Services" />
@@ -97,7 +97,7 @@ export default function Settings() {
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="company-phone">Phone Number</Label>
                         <Input id="company-phone" defaultValue="(555) 123-4567" />
@@ -117,7 +117,7 @@ export default function Settings() {
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="timezone">Timezone</Label>
                         <Select defaultValue="est">
@@ -163,7 +163,7 @@ export default function Settings() {
                     <CardDescription>Manage your personal account information</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="first-name">First Name</Label>
                         <Input id="first-name" defaultValue="John" />
@@ -174,7 +174,7 @@ export default function Settings() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="email">Email Address</Label>
                         <Input id="email" type="email" defaultValue="john.doe@cleanpro.com" />
@@ -385,7 +385,7 @@ export default function Settings() {
                       </div>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <Button variant="outline">Download Invoice</Button>
                       <Button variant="outline">Billing History</Button>
                       <Button variant="destructive">Cancel Subscription</Button>

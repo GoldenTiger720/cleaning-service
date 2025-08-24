@@ -49,10 +49,10 @@ export function RecentJobs() {
         <CardTitle className="font-heading">Recent Jobs</CardTitle>
         <CardDescription>Latest cleaning assignments and their status</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3 sm:space-y-4 px-4 sm:px-6 pb-4 sm:pb-6">
         {recentJobs.map((job) => (
-          <div key={job.id} className="flex items-center justify-between p-4 rounded-lg border border-border/50 bg-muted/20 hover:bg-muted/40 transition-smooth">
-            <div className="flex-1 space-y-2">
+          <div key={job.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 sm:p-4 rounded-lg border border-border/50 bg-muted/20 hover:bg-muted/40 transition-smooth">
+            <div className="flex-1 space-y-1.5 sm:space-y-2">
               <div className="flex items-center gap-2">
                 <h4 className="font-semibold">{job.customer}</h4>
                 <Badge variant={
@@ -63,25 +63,25 @@ export function RecentJobs() {
                 </Badge>
               </div>
               
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
-                  <MapPin className="h-3 w-3" />
-                  {job.location}
+                  <MapPin className="h-3 w-3 flex-shrink-0" />
+                  <span className="truncate max-w-[120px] sm:max-w-none">{job.location}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <User className="h-3 w-3" />
-                  {job.employee}
+                  <User className="h-3 w-3 flex-shrink-0" />
+                  <span className="truncate max-w-[120px] sm:max-w-none">{job.employee}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  {job.time}
+                  <Clock className="h-3 w-3 flex-shrink-0" />
+                  <span className="whitespace-nowrap">{job.time}</span>
                 </div>
               </div>
               
               <div className="text-xs text-primary font-medium">{job.type}</div>
             </div>
             
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="w-full sm:w-auto">
               View Details
             </Button>
           </div>
